@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Termômetro da Terceirização | Cardoso Damacena Advogados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBF7F2; --card:#FFFCF7; --line:#E7D6C0; --cream:#E7D6C0;
+  --ink:#2B2724; --ink-soft:#5E534B; --head:#1B1A19;
+  --copper:#A6671C; --copper-deep:#8A5414; --terra:#A47551;
+  --lv-baixo:#5B6B3A; --lv-mod:#B98A2C; --lv-alto:#A6671C; --lv-crit:#6B3A14;
+  --tube:#EFE4D5; --btn-ink:#FBF7F2; --chip:#F3E6D3;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1B1A19; --card:#24221F; --line:#3A3530; --cream:#E7D6C0;
+    --ink:#EDE3D6; --ink-soft:#BFAF9A; --head:#FBF7F2;
+    --copper:#D39A55; --copper-deep:#D9A867; --terra:#C49573;
+    --lv-baixo:#8FA266; --lv-mod:#D7AE55; --lv-alto:#D39A55; --lv-crit:#B87445;
+    --tube:#302C28; --btn-ink:#1B1A19; --chip:#2E2925;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1B1A19; --card:#24221F; --line:#3A3530; --cream:#E7D6C0;
+  --ink:#EDE3D6; --ink-soft:#BFAF9A; --head:#FBF7F2;
+  --copper:#D39A55; --copper-deep:#D9A867; --terra:#C49573;
+  --lv-baixo:#8FA266; --lv-mod:#D7AE55; --lv-alto:#D39A55; --lv-crit:#B87445;
+  --tube:#302C28; --btn-ink:#1B1A19; --chip:#2E2925;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Segoe UI","Open Sans",Tahoma,sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--copper-deep)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+header.top{border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:20px;padding-bottom:20px}
+.brand{display:flex;flex-direction:column;line-height:1.1;text-decoration:none;color:var(--head)}
+.brand b{font-size:19px;letter-spacing:.06em;font-weight:700}
+.brand span{font-size:12px;letter-spacing:.32em;color:var(--copper-deep);margin-top:4px}
+.top-contact{font-size:14px;color:var(--ink-soft);text-align:right}
+.top-contact a{text-decoration:none;font-weight:600}
+
+.hero{padding:56px 0 32px}
+.hero h1{font-size:clamp(34px,5vw,56px);line-height:1.08;color:var(--head);margin:0 0 18px;font-weight:700;max-width:16ch}
+.hero p{font-size:19px;color:var(--ink-soft);max-width:60ch;margin:0}
+.hero .meta{margin-top:18px;font-size:15px;color:var(--ink-soft)}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:48px;align-items:start;padding-bottom:64px}
+.block{margin-bottom:40px}
+.block h2{font-size:22px;color:var(--head);margin:0 0 4px;font-weight:700}
+.block .sub{font-size:15px;color:var(--ink-soft);margin:0 0 16px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:12px}
+.q.answered{border-color:var(--terra)}
+.q p{margin:0 0 14px;font-size:17px;color:var(--ink)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts button{font:inherit;font-size:15px;font-weight:600;padding:9px 18px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;min-height:42px}
+.opts button:hover{border-color:var(--copper)}
+.opts button[aria-pressed="true"]{background:var(--copper);border-color:var(--copper);color:var(--btn-ink)}
+.opts button.na{font-weight:400;color:var(--ink-soft)}
+.opts button.na[aria-pressed="true"]{background:var(--chip);border-color:var(--line);color:var(--ink)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--copper);outline-offset:2px}
+
+/* Termômetro */
+.gauge{position:sticky;top:calc(24px + env(safe-area-inset-top,0px));background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 24px}
+.gauge h3{margin:0 0 4px;font-size:16px;color:var(--ink-soft);font-weight:600}
+.gauge .reading{font-size:30px;font-weight:700;color:var(--head);line-height:1.15;min-height:36px}
+.gauge .pct{font-size:15px;color:var(--ink-soft);margin-top:2px}
+.therm{display:flex;gap:18px;align-items:stretch;margin:22px 0 18px}
+.therm svg{flex:none}
+.scale{display:flex;flex-direction:column;justify-content:space-between;padding:6px 0 64px;font-size:14px;color:var(--ink-soft)}
+.scale span{display:flex;align-items:center;gap:8px}
+.scale i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.progress{font-size:14px;color:var(--ink-soft)}
+.bar{height:6px;background:var(--tube);border-radius:3px;margin-top:8px;overflow:hidden}
+.bar div{height:100%;width:0;background:var(--terra);transition:width .3s}
+#mercury,#bulb{transition:all .6s cubic-bezier(.2,.8,.2,1)}
+@media (prefers-reduced-motion: reduce){#mercury,#bulb,.bar div{transition:none}}
+.gauge .see{display:block;width:100%;margin-top:18px;font:inherit;font-weight:700;font-size:16px;padding:13px;border-radius:10px;border:0;background:var(--head);color:var(--paper);cursor:pointer}
+.gauge .see:disabled{opacity:.45;cursor:not-allowed}
+
+/* Resultado */
+#resultado{display:none;border-top:1px solid var(--line);padding:56px 0 24px}
+#resultado.show{display:block}
+.res-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start}
+.res-head h2{font-size:clamp(28px,4vw,42px);line-height:1.1;margin:0 0 14px;color:var(--head)}
+.res-head p{font-size:18px;color:var(--ink-soft);margin:0}
+.lvl-tag{display:inline-block;font-weight:700;font-size:15px;padding:6px 14px;border-radius:999px;color:#FBF7F2;margin-bottom:16px}
+.points h3{font-size:18px;margin:0 0 12px;color:var(--head)}
+.points ol{margin:0;padding-left:22px}
+.points li{margin-bottom:14px}
+.points li b{display:block;color:var(--head);font-weight:600}
+.points li span{color:var(--ink-soft);font-size:15px}
+.ok{color:var(--ink-soft)}
+
+.contact{background:var(--head);color:var(--cream);border-radius:20px;padding:40px;margin:48px 0 24px}
+:root[data-theme="dark"] .contact{background:#2B2621}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .contact{background:#2B2621}}
+.contact h2{color:#FBF7F2;font-size:clamp(26px,3.4vw,36px);margin:0 0 10px;line-height:1.15}
+.contact > p{margin:0 0 28px;max-width:62ch;color:#E7D6C0}
+.people{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.person{border:1px solid #4A423A;border-radius:14px;padding:22px}
+.person h4{margin:0 0 2px;color:#FBF7F2;font-size:19px}
+.person .role{font-size:14px;color:#BFAF9A;margin-bottom:14px}
+.person a{display:block;color:#E7D6C0;text-decoration:none;font-size:15px;margin:6px 0}
+.person a:hover{color:#FBF7F2;text-decoration:underline}
+.person .wa{display:inline-block;margin-top:12px;background:#A6671C;color:#FBF7F2;font-weight:700;padding:10px 16px;border-radius:10px;font-size:15px}
+.person .wa:hover{background:#B87A2E;text-decoration:none}
+
+footer{border-top:1px solid var(--line);padding:28px 0 40px;font-size:14px;color:var(--ink-soft)}
+footer p{margin:0 0 8px;max-width:80ch}
+.reset{font:inherit;font-size:14px;background:none;border:0;color:var(--copper-deep);text-decoration:underline;cursor:pointer;padding:0}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;gap:0}
+  .gauge{position:sticky;top:0;border-radius:0 0 14px 14px;padding:14px 18px;margin:0 -24px 28px;order:-1;z-index:5}
+  .gauge .therm,.gauge h3{display:none}
+  .gauge .see{margin-top:10px;padding:10px;font-size:15px}
+  .gauge .reading{font-size:20px;min-height:0}
+  .gauge.mob-row{display:flex}
+  .res-head{grid-template-columns:1fr;gap:28px}
+  .people{grid-template-columns:1fr}
+  .contact{padding:28px 22px}
+  .top-contact{display:none}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#inicio" aria-label="Cardoso Damacena Advogados">
+      <b>CARDOSO DAMACENA</b>
+      <span>ADVOGADOS</span>
+    </a>
+    <div class="top-contact">Direito do Trabalho para empresas<br><a href="#contato">Fale com o escritório</a></div>
+  </div>
+</header>
+
+<main class="wrap" id="inicio">
+  <section class="hero">
+    <h1>Termômetro da Terceirização</h1>
+    <p>Responda a 19 perguntas sobre como sua empresa contrata e acompanha prestadores de serviço e veja quanto o seu modelo se aproxima, aos olhos de um juiz ou de um auditor, de uma intermediação de mão de obra.</p>
+    <p class="meta">Leva cerca de 5 minutos. As respostas ficam só no seu navegador.</p>
+  </section>
+
+  <div class="layout">
+    <div id="perguntas"></div>
+
+    <aside class="gauge" aria-live="polite">
+      <h3>Sua leitura até agora</h3>
+      <div class="reading" id="reading">Responda para medir</div>
+      <div class="pct" id="pct">&nbsp;</div>
+      <div class="therm">
+        <svg width="70" height="300" viewBox="0 0 70 300" role="img" aria-label="Termômetro de risco">
+          <rect x="22" y="8" width="26" height="236" rx="13" style="fill:var(--tube)"/>
+          <rect id="mercury" x="28" y="238" width="14" height="0" rx="7" style="fill:var(--lv-baixo)"/>
+          <circle cx="35" cy="262" r="30" style="fill:var(--tube)"/>
+          <circle id="bulb" cx="35" cy="262" r="22" style="fill:var(--terra)"/>
+          <g style="stroke:var(--ink-soft)" stroke-width="1.5" opacity=".5">
+            <line x1="52" y1="62" x2="60" y2="62"/><line x1="52" y1="114" x2="60" y2="114"/><line x1="52" y1="172" x2="60" y2="172"/>
+          </g>
+        </svg>
+        <div class="scale">
+          <span><i style="background:var(--lv-crit)"></i>Crítico</span>
+          <span><i style="background:var(--lv-alto)"></i>Alto</span>
+          <span><i style="background:var(--lv-mod)"></i>Moderado</span>
+          <span><i style="background:var(--lv-baixo)"></i>Baixo</span>
+        </div>
+      </div>
+      <div class="progress"><span id="count">0 de 19 respondidas</span><div class="bar"><div id="barfill"></div></div></div>
+      <button class="see" id="see" disabled>Ver meu resultado</button>
+    </aside>
+  </div>
+
+  <section id="resultado" aria-live="polite">
+    <div class="res-head">
+      <div>
+        <span class="lvl-tag" id="r-tag">Risco</span>
+        <h2 id="r-title"></h2>
+        <p id="r-text"></p>
+      </div>
+      <div class="points">
+        <h3>Onde agir primeiro</h3>
+        <ol id="r-points"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contato">
+    <h2>Quer transformar o resultado em um plano de ajuste?</h2>
+    <p>O Cardoso Damacena Advogados atua exclusivamente em Direito do Trabalho e ajuda empresas a revisar contratos com prestadores, rotinas de fiscalização e documentação, para que a terceirização funcione sem virar passivo.</p>
+    <div class="people">
+      <div class="person">
+        <h4>Alice Cardoso</h4>
+        <div class="role">Sócia fundadora</div>
+        <a href="tel:+5527997948040">(27) 99794-8040</a>
+        <a href="mailto:alice@cardosodamacena.com">alice@cardosodamacena.com</a>
+        <a href="https://instagram.com/alicecardoso.adv" target="_blank" rel="noopener">@alicecardoso.adv</a>
+        <a class="wa" data-wa="5527997948040" href="https://wa.me/5527997948040" target="_blank" rel="noopener">Conversar no WhatsApp</a>
+      </div>
+      <div class="person">
+        <h4>Indiana Damacena</h4>
+        <div class="role">Sócia fundadora</div>
+        <a href="tel:+5527997341749">(27) 99734-1749</a>
+        <a href="mailto:indiana@cardosodamacena.com">indiana@cardosodamacena.com</a>
+        <a href="https://instagram.com/advogadaindianadamacena" target="_blank" rel="noopener">@advogadaindianadamacena</a>
+        <a class="wa" data-wa="5527997341749" href="https://wa.me/5527997341749" target="_blank" rel="noopener">Conversar no WhatsApp</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Ferramenta de autoavaliação com caráter informativo, elaborada com base na Lei 6.019/1974, na CLT e na jurisprudência do STF e do TST. Não substitui a análise do caso concreto por um advogado.</p>
+    <p>Cardoso Damacena Advogados, Vitória/ES. <button class="reset" id="reset">Apagar respostas e recomeçar</button></p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var BLOCKS = [
+    {t:"Escolha da prestadora e contrato", s:"Como a relação começa.", q:[
+      {id:"q1", txt:"Antes de contratar, você verifica CNPJ, certidões e se o capital social da prestadora é compatível com o número de empregados dela?", good:"sim", w:2, why:"Verificar a idoneidade da prestadora", tip:"O STF atribui à tomadora o dever de verificar a idoneidade e a capacidade econômica da terceirizada (ADPF 324)."},
+      {id:"q2", txt:"O contrato descreve o serviço e as entregas esperadas, e não apenas quantas pessoas ou horas você está comprando?", good:"sim", w:2, why:"Contratar entregas, e não pessoas ou horas", tip:"Preço por pessoa ou por hora, sem entregas definidas, é indício de fornecimento de mão de obra."},
+      {id:"q3", txt:"A prestadora só pode subcontratar outra empresa com sua autorização prévia e por escrito?", good:"sim", w:1, why:"Controlar a subcontratação", tip:"A lei permite subcontratar, mas a tomadora final costuma responder por toda a cadeia."},
+      {id:"q4", txt:"O contrato prevê garantias, como retenção de valores, seguro ou pagamento direto de verbas se a prestadora não pagar?", good:"sim", w:1, why:"Prever garantias contratuais", tip:"Sua empresa responde de forma subsidiária pelas verbas que a prestadora deixar de pagar (Lei 6.019, art. 5º-A, §5º)."}
+    ]},
+    {t:"O dia a dia com os terceirizados", s:"Onde a terceirização costuma virar vínculo.", q:[
+      {id:"q5", txt:"Suas orientações aos terceirizados passam pelo encarregado ou preposto da prestadora?", good:"sim", w:3, why:"Passar as ordens pelo preposto da prestadora", tip:"Quem dirige o trabalho é a prestadora. Ordem direta e rotineira da tomadora é o principal sinal de vínculo."},
+      {id:"q6", txt:"Sua empresa entrevista, escolhe ou veta pessoas indicadas pela prestadora?", good:"nao", w:3, why:"Deixar de escolher ou vetar pessoas", tip:"Escolher a pessoa, e não o serviço, caracteriza pessoalidade. Defina um perfil técnico mínimo e deixe a alocação com a prestadora."},
+      {id:"q7", txt:"Sua empresa controla o ponto, aprova férias ou autoriza horas extras dos terceirizados?", good:"nao", w:3, why:"Deixar a jornada com a prestadora", tip:"Controlar a jornada é poder do empregador. Exercido pela tomadora, aproxima o terceirizado de um empregado seu."},
+      {id:"q8", txt:"Sua empresa avalia individualmente, dá feedback ou pede o desligamento de terceirizados específicos?", good:"nao", w:2, why:"Avaliar o serviço, e não a pessoa", tip:"Cobre a prestadora com indicadores e consequências contratuais, como glosa e multa."},
+      {id:"q9", txt:"Os terceirizados usam crachá, e-mail ou assinatura com a marca da sua empresa?", good:"nao", w:1, why:"Separar a identificação dos terceirizados", tip:"Identificação da tomadora é prova pronta de integração à sua estrutura."},
+      {id:"q10", txt:"Terceirizados e empregados próprios fazem a mesma função, na mesma equipe e sob o mesmo chefe?", good:"nao", w:3, why:"Evitar equipes mistas sob a mesma chefia", tip:"Mesmo cargo, mesma sala e mesmo chefe são a prova mais fácil de integração e subordinação."}
+    ]},
+    {t:"Documentos e cadeia de contratação", s:"O que protege sua empresa na hora de pagar.", q:[
+      {id:"q11", txt:"Antes de pagar a prestadora, você confere a folha de pagamento, o FGTS e o INSS dos terceirizados?", good:"sim", w:2, why:"Conferir a documentação antes de pagar", tip:"Conferir a documentação reduz o risco de pagar duas vezes: à prestadora e, depois, aos trabalhadores dela."},
+      {id:"q12", txt:"Você sabe quem é o empregador de cada pessoa que trabalha nas suas dependências, inclusive de subcontratadas?", good:"sim", w:1, why:"Mapear o empregador de cada pessoa", tip:"Sem esse mapa, a empresa não sabe por quem pode vir a responder."},
+      {id:"q13", txt:"Há terceirizados no mesmo posto há mais de dois anos, ou que continuaram com você depois da troca de prestadora?", good:"nao", w:3, why:"Evitar que a pessoa fique enquanto a empresa muda", tip:"Quando a prestadora muda e a pessoa fica, o juiz tende a concluir que o vínculo real é com quem ficou."},
+      {id:"q14", txt:"Algum ex-empregado seu voltou como terceirizado ou como PJ menos de 18 meses após o desligamento?", good:"nao", w:3, why:"Respeitar a quarentena de 18 meses", tip:"A Lei 6.019 (arts. 5º-C e 5º-D) proíbe esse retorno antes de 18 meses."}
+    ]},
+    {t:"Segurança e saúde", s:"Um dever que é da sua empresa, e não só da prestadora.", q:[
+      {id:"q15", txt:"Os terceirizados passam por integração de segurança e estão no seu gerenciamento de riscos?", good:"sim", w:2, why:"Integrar os terceirizados à segurança do trabalho", tip:"Garantir segurança, higiene e salubridade nas suas dependências é dever da tomadora (Lei 6.019, art. 5º-A, §3º)."},
+      {id:"q16", txt:"Eles têm acesso às mesmas condições de refeitório, sanitários e atendimento ambulatorial dos seus empregados?", good:"sim", w:1, why:"Assegurar as mesmas condições de ambiente", tip:"A Lei 6.019 (art. 4º-C) assegura essas condições quando o serviço é prestado nas suas dependências."}
+    ]},
+    {t:"Fiscalização do contrato", s:"Para quem usa fiscais, gestores ou empresas gerenciadoras.", q:[
+      {id:"q17", txt:"Quem dá o aceite final da medição e libera o pagamento é empregado da sua empresa?", good:"sim", w:2, why:"Manter a decisão final com a sua empresa", tip:"O terceiro pode medir e informar. Quando a decisão fica com a casa, o risco de intermediação diminui."},
+      {id:"q18", txt:"O desempenho da prestadora é cobrado por indicadores e consequências contratuais, como glosa, multa ou bônus?", good:"sim", w:2, why:"Gerir o contrato por indicadores", tip:"É a forma de cobrar resultado sem subordinar as pessoas."},
+      {id:"q19", txt:"A prestadora aloca na sua operação profissionais contratados como PJ?", good:"nao", w:2, why:"Exigir equipe registrada da prestadora", tip:"Ao risco da terceirização soma-se o debate sobre pejotização, ainda pendente no STF (Tema 1389)."}
+    ]}
+  ];
+  var ALL = []; BLOCKS.forEach(function(b){ b.q.forEach(function(q){ ALL.push(q); }); });
+  var TOTAL = ALL.length;
+  var LEVELS = [
+    {max:20, name:"baixo", label:"Risco baixo", color:"var(--lv-baixo)", title:"Seu modelo segue as boas práticas", text:"As respostas indicam uma terceirização bem estruturada. Mantenha a revisão periódica dos contratos e da rotina, porque o risco costuma crescer aos poucos, com a convivência diária."},
+    {max:40, name:"moderado", label:"Risco moderado", color:"var(--lv-mod)", title:"Há pontos que podem virar passivo", text:"A estrutura é boa, mas alguns hábitos aproximam os terceirizados da sua empresa. Ajustes de contrato e de rotina resolvem a maior parte deles."},
+    {max:65, name:"alto", label:"Risco alto", color:"var(--lv-alto)", title:"A rotina tem sinais de intermediação", text:"Juízes e auditores fiscais olham o dia a dia, e não o nome do contrato. Vários sinais que eles associam à intermediação de mão de obra aparecem nas suas respostas."},
+    {max:101, name:"crítico", label:"Risco crítico", color:"var(--lv-crit)", title:"O arranjo atual se aproxima de um vínculo direto", text:"As respostas mostram traços fortes de subordinação e pessoalidade com a sua empresa. Vale revisar o modelo com prioridade, antes que uma ação ou uma fiscalização o faça."}
+  ];
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem("cd-termometro") || "{}") || {}; } catch(e){ state = {}; }
+
+  function save(){ try { localStorage.setItem("cd-termometro", JSON.stringify(state)); } catch(e){} }
+  function factor(q, a){
+    if (a === "na" || a == null) return null;
+    if (a === "parte") return 0.5;
+    return a === q.good ? 0 : 1;
+  }
+  function compute(){
+    var num=0, den=0, answered=0;
+    ALL.forEach(function(q){
+      var a = state[q.id]; if (a != null) answered++;
+      var f = factor(q, a); if (f === null) return;
+      num += f*q.w; den += q.w;
+    });
+    return {answered:answered, pct: den ? Math.round(num/den*100) : null};
+  }
+  function level(p){ for (var i=0;i<LEVELS.length;i++){ if (p < LEVELS[i].max) return LEVELS[i]; } return LEVELS[LEVELS.length-1]; }
+
+  var root = document.getElementById("perguntas");
+  var n = 0;
+  BLOCKS.forEach(function(b){
+    var sec = document.createElement("section"); sec.className="block";
+    var h = document.createElement("h2"); h.textContent = b.t; sec.appendChild(h);
+    var s = document.createElement("p"); s.className="sub"; s.textContent = b.s; sec.appendChild(s);
+    b.q.forEach(function(q){
+      n++;
+      var box = document.createElement("div"); box.className="q"; box.id="box-"+q.id;
+      var p = document.createElement("p"); p.id="lbl-"+q.id; p.textContent = n + ". " + q.txt; box.appendChild(p);
+      var opts = document.createElement("div"); opts.className="opts"; opts.setAttribute("role","group"); opts.setAttribute("aria-labelledby","lbl-"+q.id);
+      [["sim","Sim"],["parte","Em parte"],["nao","Não"],["na","Não se aplica"]].forEach(function(o){
+        var bt = document.createElement("button"); bt.type="button"; bt.textContent=o[1]; bt.dataset.v=o[0];
+        if (o[0]==="na") bt.className="na";
+        bt.setAttribute("aria-pressed", state[q.id]===o[0] ? "true":"false");
+        bt.addEventListener("click", function(){
+          state[q.id] = o[0]; save();
+          Array.prototype.forEach.call(opts.children, function(c){ c.setAttribute("aria-pressed", c===bt ? "true":"false"); });
+          box.classList.add("answered");
+          update();
+        });
+        opts.appendChild(bt);
+      });
+      if (state[q.id]!=null) box.classList.add("answered");
+      box.appendChild(opts); sec.appendChild(box);
+    });
+    root.appendChild(sec);
+  });
+
+  var mercury = document.getElementById("mercury"), bulb = document.getElementById("bulb");
+  function update(){
+    var r = compute();
+    document.getElementById("count").textContent = r.answered + " de " + TOTAL + " respondidas";
+    document.getElementById("barfill").style.width = (r.answered/TOTAL*100) + "%";
+    var see = document.getElementById("see");
+    see.disabled = r.answered < TOTAL;
+    see.textContent = r.answered < TOTAL ? "Responda todas para ver o resultado" : "Ver meu resultado";
+    if (r.answered < 3 || r.pct === null){
+      document.getElementById("reading").textContent = "Responda para medir";
+      document.getElementById("pct").innerHTML = "&nbsp;";
+      mercury.setAttribute("height", 0); mercury.setAttribute("y", 238);
+      bulb.style.fill="var(--terra)";
+      return;
+    }
+    var lv = level(r.pct);
+    document.getElementById("reading").textContent = lv.label;
+    document.getElementById("pct").textContent = r.pct + "% do risco máximo" + (r.answered < TOTAL ? ", leitura parcial" : "");
+    var hgt = Math.max(6, Math.round(226 * r.pct/100));
+    mercury.setAttribute("height", hgt); mercury.setAttribute("y", 238 - hgt + 6);
+    mercury.style.fill = lv.color; bulb.style.fill = lv.color;
+    if (document.getElementById("resultado").classList.contains("show")) renderResult();
+  }
+
+  function renderResult(){
+    var r = compute(); if (r.pct === null) return;
+    var lv = level(r.pct);
+    var tag = document.getElementById("r-tag");
+    tag.textContent = lv.label + ", " + r.pct + "%"; tag.style.background = lv.color; tag.style.color = (lv.name === "moderado") ? "#1B1A19" : "#FBF7F2";
+    document.getElementById("r-title").textContent = lv.title;
+    document.getElementById("r-text").textContent = lv.text;
+    var pts = ALL.map(function(q){ return {q:q, f:factor(q, state[q.id])}; })
+      .filter(function(x){ return x.f && x.f > 0; })
+      .sort(function(a,b){ return (b.f*b.q.w) - (a.f*a.q.w); })
+      .slice(0,5);
+    var ol = document.getElementById("r-points"); ol.innerHTML = "";
+    if (!pts.length){
+      var li = document.createElement("li"); li.className="ok"; li.textContent = "Nenhum ponto crítico nas respostas. Mantenha a revisão anual dos contratos."; ol.appendChild(li);
+    }
+    pts.forEach(function(x){
+      var li = document.createElement("li");
+      var b = document.createElement("b"); b.textContent = x.q.why;
+      var sp = document.createElement("span"); sp.textContent = x.q.tip;
+      li.appendChild(b); li.appendChild(sp); ol.appendChild(li);
+    });
+    var msg = "Olá! Fiz o Termômetro da Terceirização do Cardoso Damacena Advogados e o resultado foi " + lv.label.toLowerCase() + " (" + r.pct + "%). Gostaria de conversar sobre o modelo da minha empresa.";
+    Array.prototype.forEach.call(document.querySelectorAll("a.wa"), function(a){
+      a.href = "https://wa.me/" + a.dataset.wa + "?text=" + encodeURIComponent(msg);
+    });
+  }
+
+  document.getElementById("see").addEventListener("click", function(){
+    var res = document.getElementById("resultado");
+    res.classList.add("show"); renderResult();
+    res.scrollIntoView({behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"});
+  });
+  document.getElementById("reset").addEventListener("click", function(){
+    state = {}; save();
+    Array.prototype.forEach.call(document.querySelectorAll(".opts button"), function(b){ b.setAttribute("aria-pressed","false"); });
+    Array.prototype.forEach.call(document.querySelectorAll(".q"), function(b){ b.classList.remove("answered"); });
+    document.getElementById("resultado").classList.remove("show");
+    update(); window.scrollTo(0,0);
+  });
+  update();
+})();
+</script>
+</body>
+</html>
