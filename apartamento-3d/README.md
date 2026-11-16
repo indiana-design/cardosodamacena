@@ -1,9 +1,9 @@
 # Apartamento 02 em 3D
 
-Modelo 3D do apartamento 02 (pavimento tipo da cobertura), montado a partir das fotos da planta e das medidas e áreas anotadas nela.
+Planta baixa e modelo 3D do apartamento 02 (pavimento tipo), montados a partir das fotos da planta e das medidas e áreas anotadas nela.
 
-- `index.html`: modelo interativo (Vista 3D, Planta e Caminhar). Usa three.js 0.147 via jsDelivr.
-- `imagens/`: renderizações estáticas (vista geral, planta 3D, corte e vistas internas).
+- `index.html`: página interativa (Planta baixa, Vista 3D e Caminhar). Usa three.js 0.147 via jsDelivr.
+- `imagens/`: planta baixa em PNG (paisagem e retrato).
 
 ## Áreas usadas (anotações da planta)
 
@@ -29,4 +29,4 @@ Modelo 3D do apartamento 02 (pavimento tipo da cobertura), montado a partir das 
 - A suíte inclui o recanto de 1,22×1,50 junto à varanda (como na conta 11,55 + 1,83 = 13,38), com a porta-janela PJ1 abrindo para a varanda.
 - Entrada social pelo hall, por um pequeno hall de 1,35×0,90 que faz parte da sala; entrada de serviço direto na cozinha.
 - Tamanho e posição de janelas, peitoris e móveis são ilustrativos.
-- A escada caracol leva ao pavimento superior da cobertura, que não foi modelado.
+- A escada caracol da planta existe só nos apartamentos com cobertura; o apto 02 não tem, e o espaço fica como parte da sala.
