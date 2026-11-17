@@ -2,6 +2,8 @@
 
 **Proposta de interiores (repaginação pontual)**: `index.html` abre na proposta, com botão para comparar com o estado atual; `projeto.html` traz as 14 pranchas A3 do projeto executivo (com perspectivas renderizadas em Blender/Cycles nas pranchas 02 e 03); `Projeto-Executivo-Apto02.pdf` é a versão para impressão. Os dados da planta e da proposta ficam em `dados.js`, usados pelo 3D e pelas pranchas.
 
+**Modelo em Blender**: a pasta `blender/` refaz o apartamento por script Python (`apto_build.py`) com as mesmas medidas, móveis, plantas, texturas e HDRI gratuitos do Poly Haven, e gera no Cycles as imagens da sala, da cozinha (2 vistas) e da suíte em 1920×1080, com câmera a 1,60 m e luz natural pelas janelas. Veja `blender/LEIAME.md`.
+
 Modelo 3D e planta baixa do apartamento 02 (pavimento tipo) como está hoje: medidas e áreas da planta anotada, acabamentos e itens fixos tirados das fotos do imóvel.
 
 - `index.html`: página interativa (Planta baixa, Vista 3D e Caminhar). Usa three.js 0.147 via jsDelivr.
