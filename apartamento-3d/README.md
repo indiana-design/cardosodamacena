@@ -1,6 +1,6 @@
 # Apartamento 02 em 3D
 
-**Proposta de interiores (repaginação pontual)**: `index.html` abre na proposta, com botão para comparar com o estado atual; `projeto.html` traz as 12 pranchas A3 do projeto executivo; `Projeto-Executivo-Apto02.pdf` é a versão para impressão. Os dados da planta e da proposta ficam em `dados.js`, usados pelo 3D e pelas pranchas.
+**Proposta de interiores (repaginação pontual)**: `index.html` abre na proposta, com botão para comparar com o estado atual; `projeto.html` traz as 14 pranchas A3 do projeto executivo (com perspectivas renderizadas em Blender/Cycles nas pranchas 02 e 03); `Projeto-Executivo-Apto02.pdf` é a versão para impressão. Os dados da planta e da proposta ficam em `dados.js`, usados pelo 3D e pelas pranchas.
 
 Modelo 3D e planta baixa do apartamento 02 (pavimento tipo) como está hoje: medidas e áreas da planta anotada, acabamentos e itens fixos tirados das fotos do imóvel.
 

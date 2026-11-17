@@ -31,7 +31,7 @@ main{display:flex;flex-direction:column;align-items:center;gap:18px;padding-bloc
 <body>
 <div class="top">
   <h1>Projeto executivo de interiores · Apartamento 02</h1>
-  <p>12 pranchas A3, geradas a partir do mesmo modelo do 3D. Conferir as medidas no local antes de executar.</p>
+  <p>14 pranchas A3, geradas a partir do mesmo modelo do 3D. Conferir as medidas no local antes de executar.</p>
   <nav id="nav"></nav>
 </div>
 <main id="main"></main>
@@ -43,7 +43,7 @@ main{display:flex;flex-direction:column;align-items:center;gap:18px;padding-bloc
 const F=(v,d=2)=>Number(v).toFixed(d).replace('.',',');
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const n1=v=>Math.round(v*100)/100;
-const DATA='17/11/2026', TOTAL=12;
+const DATA='17/11/2026', TOTAL=14;
 const FONT="Barlow Semi Condensed, Arial Narrow, sans-serif", MONO="IBM Plex Mono, monospace";
 const PAL={}; PROP.paleta.forEach(p=>PAL[p.cod]=p);
 function T(x,y,txt,o={}){ return `<text x="${n1(x)}" y="${n1(y)}" font-family="${o.mono?MONO:FONT}" font-size="${o.s||2.6}" font-weight="${o.w||400}" fill="${o.c||'#222'}" text-anchor="${o.a||'start'}"${o.rot?` transform="rotate(${o.rot} ${n1(x)} ${n1(y)})"`:''}${o.ls?` letter-spacing="${o.ls}"`:''}>${esc(txt)}</text>`; }
@@ -247,7 +247,7 @@ const IMG=n=>`imagens/${n}.jpg`;
   b+=T(24,24,'PROJETO DE INTERIORES',{s:4,w:600,ls:0.6,c:'#7A6A58'});
   b+=T(24,38,'Apartamento 02 · repaginação pontual',{s:11,w:700});
   b+=TW(24,47,PROP.conceito+' Sem quebra-quebra: o piso novo é instalado sobre o atual, a cozinha troca a marcenaria e ganha frontão de porcelanato sobre o azulejo, e a pintura e a iluminação fazem o resto.',118,{s:3.2,c:'#333',lh:4.4});
-  const imgs=[['proposta-01-sala-jantar','Sala e jantar'],['proposta-04-cozinha','Cozinha'],['proposta-03-jantar','Jantar com arco pintado'],['proposta-06-banheiro','Banheiro social'],['proposta-07-noite','Iluminação noturna'],['proposta-02-estar','Estar']];
+  const imgs=[['render-sala-jantar','Sala e jantar'],['render-cozinha','Cozinha'],['render-jantar','Jantar com arco pintado'],['render-banheiro','Banheiro social'],['render-noite','Iluminação noturna'],['render-estar','Estar']];
   imgs.forEach(([f,c],i)=>{ const col=i%3, row=Math.floor(i/3), x=24+col*94, y=68+row*67; b+=`<image href="${IMG(f)}" x="${x}" y="${y}" width="90" height="56.25" preserveAspectRatio="xMidYMid slice"/>`+Rc(x,y,90,56.25,{w:0.2,s:'#999'})+T(x,y+60,c,{s:2.6,w:600}); });
   // paleta
   const px=314; b+=T(px,24,'PALETA DE CORES',{s:2.6,w:700,ls:0.4});
@@ -255,10 +255,31 @@ const IMG=n=>`imagens/${n}.jpg`;
   b+=T(px,108,'MATERIAIS',{s:2.6,w:700,ls:0.4});
   PROP.materiais.forEach((m,i)=>{ const y=112+i*12.6; b+=Rc(px,y,16,10,{f:m.hex,s:'#999',w:0.15})+T(px+19,y+4,`${m.cod} · ${m.nome}`,{s:2.4,w:600}); b+=TW(px+19,y+7.6,m.uso,46,{s:1.95,c:'#555',lh:2.3}); });
   b+=T(24,212,'ÍNDICE DE PRANCHAS',{s:2.6,w:700,ls:0.4});
-  const idx=['Capa, conceito e perspectivas','Planta de layout (ambientação)','Pontos elétricos, hidráulicos e de gás','Iluminação: planta de forro e luminárias','Paginação de piso: laminado e rodapé','Pintura e acabamentos de parede','Cozinha: planta e elevações','Cozinha: módulos, eletros e detalhes','Banheiro social: planta, elevação e detalhes','Sala: painel, rack, aparador e cortina','Mobiliário e decoração','Especificações, quantitativos e sequência de obra'];
-  idx.forEach((t,i)=>{ const col=Math.floor(i/6), y=217+(i%6)*5, x=24+col*100; b+=T(x,y,`${String(i+1).padStart(2,'0')}  ${t}`,{s:2.5}); });
-  sheets.push(sheet(1,'Capa e conceito','—',b,['Imagens do modelo 3D da proposta (ilustrativas). Cores reais variam com a tela: aprovar as tintas pelo leque físico do fabricante.','Códigos PT, LM, MD, PC etc. remetem às especificações da prancha 12.']));
+  const idx=['Capa, conceito e paleta','Perspectivas: sala, estar e jantar','Perspectivas: cozinha e banheiro','Planta de layout (ambientação)','Pontos elétricos, hidráulicos e de gás','Iluminação: planta de forro e luminárias','Paginação de piso: laminado e rodapé','Pintura e acabamentos de parede','Cozinha: planta e elevações','Cozinha: módulos, eletros e detalhes','Banheiro social: planta, elevação e detalhes','Sala: painel, rack, aparador e cortina','Mobiliário e decoração','Especificações, quantitativos e sequência de obra'];
+  idx.forEach((t,i)=>{ const col=Math.floor(i/7), y=217+(i%7)*4.4, x=24+col*100; b+=T(x,y,`${String(i+1).padStart(2,'0')}  ${t}`,{s:2.5}); });
+  sheets.push(sheet(1,'Capa e conceito','—',b,['Perspectivas renderizadas (ilustrativas) a partir do modelo do projeto. Cores reais variam com a tela: aprovar as tintas pelo leque físico do fabricante.','Códigos PT, LM, MD, PC etc. remetem às especificações da prancha 14.']));
 })();
+
+// 02 e 03 — Perspectivas renderizadas
+function perspSheet(num,title,list,notes){
+  let b=''; const W=183, H=104;   // 2×2 acima do carimbo (topo em ~252 mm)
+  list.forEach(([f,cap,leg],i)=>{ const x=24+(i%2)*(W+6), y=16+Math.floor(i/2)*(H+12);
+    b+=`<image href="${IMG(f)}" x="${x}" y="${y}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"/>`+Rc(x,y,W,H,{w:0.2,s:'#888'});
+    b+=T(x,y+H+4.2,cap,{s:3,w:700})+T(x+W,y+H+4.2,leg,{s:2.1,a:'end',c:'#555'}); });
+  sheets.push(sheet(num,title,'sem escala',b,notes));
+}
+perspSheet(2,'Perspectivas: sala, estar e jantar',[
+  ['render-sala-jantar','Sala integrada','LM-01 · PT-04 · MC-03 · M-06/M-07 · L-03'],
+  ['render-estar','Estar','MC-01 · MC-02 · M-01 · M-03/M-04 · L-01'],
+  ['render-jantar','Jantar com arco pintado','PT-04 · D-07 · MC-03 · L-06'],
+  ['render-noite','À noite: o projeto de luz','L-01 · L-02 · L-03 · L-04 · L-05 · L-06']],
+  ['Imagens renderizadas com luz física (sol, céu e luminárias do projeto) a partir do mesmo modelo das plantas.','Tons de madeira, tecido e tinta variam com a tela: aprovar com amostras físicas.']);
+perspSheet(3,'Perspectivas: cozinha e banheiro',[
+  ['render-cozinha','Cozinha: pia, fogão e lava-louças','MD-02 · PC-01 · IN-01 · L-09/L-10'],
+  ['render-cozinha-cafe','Cozinha: café, torre e geladeira','MD-01 · C1/C2/C3 · E-02'],
+  ['render-banheiro','Banheiro social','MC-05 · B-04/B-05/B-06 · D-14 · L-12'],
+  ['proposta-08-vista-geral','Vista geral do modelo 3D','proposta completa']],
+  ['A cozinha mantém o piso e o azulejo atuais; o frontão em porcelanato é assentado sobre o azulejo.','No banheiro, a faixa de granito existente permanece e conversa com os metais pretos.']);
 
 // 02 — Layout
 (function(){
@@ -279,10 +300,10 @@ const IMG=n=>`imagens/${n}.jpg`;
   { const a=P(4.0,0.435), c=P(4.0,2.02); b+=dim(a[0],a[1],c[0],c[1],-3,'1,59'); }
   b+=scaleBar(26,202,s);
   // legenda
-  const rows=PROP.itens.map(i=>[i.cod,i.nome,i.dim]).concat([['MC-04','Marcenaria da cozinha (ver pranchas 07 e 08)','—'],['MC-05','Gabinete do banheiro social (ver prancha 09)','—']]);
+  const rows=PROP.itens.map(i=>[i.cod,i.nome,i.dim]).concat([['MC-04','Marcenaria da cozinha (ver pranchas 09 e 10)','—'],['MC-05','Gabinete do banheiro social (ver prancha 11)','—']]);
   const t=tableSVG(358,12,[{h:'CÓD',w:9,b:1},{h:'ITEM',w:46,wrap:38}],rows.map(r=>[r[0],r[1]]),{fs:1.75,rh:3.4});
   b+=t.s;
-  sheets.push(sheet(2,'Planta de layout','1:50',b,['Mobiliário solto conforme lista da prancha 11; posições cotadas a partir das paredes acabadas.','Circulação livre mínima de 0,80 m entre móveis; atrás das cadeiras do jantar, 0,85 m até o aparador.','Cozinha e banheiro social: ver detalhamento nas pranchas 07 a 09.']));
+  sheets.push(sheet(4,'Planta de layout','1:50',b,['Mobiliário solto conforme lista da prancha 13; posições cotadas a partir das paredes acabadas.','Circulação livre mínima de 0,80 m entre móveis; atrás das cadeiras do jantar, 0,85 m até o aparador.','Cozinha e banheiro social: ver detalhamento nas pranchas 09 a 11.']));
 })();
 
 // 03 — Pontos
@@ -300,7 +321,7 @@ const IMG=n=>`imagens/${n}.jpg`;
   b+=t.s;
   let ly=12+t.h+6; b+=T(358,ly,'LEGENDA',{s:2.2,w:700}); ly+=4;
   [['tomada','Tomada (2P+T)'],['luz','Ponto de luz no teto'],['interruptor','Interruptor'],['agua','Água fria'],['esgoto','Esgoto'],['gas','Gás']].forEach(([k,txt],i)=>{ b+=sym[k](361,ly+i*5)+T(365,ly+i*5+0.9,txt,{s:2.1}); });
-  sheets.push(sheet(3,'Pontos elétricos, hidráulicos e gás','1:50',b,['Alturas medidas do piso acabado ao centro da caixa.','Lava-louças: circuito exclusivo com disjuntor próprio (NBR 5410); água e esgoto pelo gabinete da pia, sem quebrar parede.','Gás: manter o ponto existente; troca do flexível por mangueira certificada, feita por profissional habilitado.','Tomadas no frontão: abrir furos no porcelanato com serra-copo antes do assentamento.']));
+  sheets.push(sheet(5,'Pontos elétricos, hidráulicos e gás','1:50',b,['Alturas medidas do piso acabado ao centro da caixa.','Lava-louças: circuito exclusivo com disjuntor próprio (NBR 5410); água e esgoto pelo gabinete da pia, sem quebrar parede.','Gás: manter o ponto existente; troca do flexível por mangueira certificada, feita por profissional habilitado.','Tomadas no frontão: abrir furos no porcelanato com serra-copo antes do assentamento.']));
 })();
 
 // 04 — Iluminação
@@ -322,7 +343,7 @@ const IMG=n=>`imagens/${n}.jpg`;
   const rows=PROP.luminarias.map(l=>[l.cod,l.nome,String(l.qtd),l.cmd]);
   const t=tableSVG(358,12,[{h:'CÓD',w:8.5,b:1},{h:'LUMINÁRIA',w:36.5,wrap:30},{h:'QTD',w:6},{h:'CMD',w:4}],rows,{fs:1.75,rh:3.6});
   b+=t.s;
-  sheets.push(sheet(4,'Iluminação: forro e luminárias','1:50',b,['Sem forro de gesso novo: trilho, pendente e plafons usam os pontos de luz existentes (o do pendente é deslocado até o centro da mesa).','Temperatura de cor 3000 K nas áreas sociais, cozinha e banheiro (aconchego); 4000 K só na área de serviço. IRC ≥ 80.','Letras (a, b, c...) indicam o comando de cada circuito; fitas LED com driver em local ventilado e acessível.','Abajur e luminária de piso ligados em tomada (pontos TO-10 e TO-11).']));
+  sheets.push(sheet(6,'Iluminação: forro e luminárias','1:50',b,['Sem forro de gesso novo: trilho, pendente e plafons usam os pontos de luz existentes (o do pendente é deslocado até o centro da mesa).','Temperatura de cor 3000 K nas áreas sociais, cozinha e banheiro (aconchego); 4000 K só na área de serviço. IRC ≥ 80.','Letras (a, b, c...) indicam o comando de cada circuito; fitas LED com driver em local ventilado e acessível.','Abajur e luminária de piso ligados em tomada (pontos TO-10 e TO-11).']));
 })();
 
 // 05 — Paginação de piso
@@ -353,7 +374,7 @@ const IMG=n=>`imagens/${n}.jpg`;
   b+=Rc(dx+4,dy+17.6,44,0.4,{f:'#9AA',s:'none'})+Rc(dx+4,dy+16,44,1.6,{f:'#C9A57A',s:'#7A5A38',w:0.15});
   b+=Rc(dx,dy,2.4,24,{f:'#E9E7E2',s:'#555',w:0.2})+Rc(dx+2.4,dy-4,1.5,24,{f:'#fff',s:'#333',w:0.2}).replace('height="24"','height="20"');
   b+=T(dx+9,dy+3,'rodapé RD-01 10 cm (colado)',{s:1.6})+T(dx+9,dy+6,'folga de dilatação 10 mm',{s:1.6})+T(dx+9,dy+9,'laminado 8 mm + manta 2 mm',{s:1.6})+T(dx+9,dy+12,'sobre o porcelanato existente',{s:1.6});
-  sheets.push(sheet(5,'Paginação de piso: laminado e rodapé','1:50 · det. 1:5',b,['LM-01 instalado flutuante sobre o porcelanato atual (sem demolição), com manta de 2 mm; desnível total ~10 mm.','Réguas no sentido do comprimento da sala (paralelas à luz da varanda), contínuas por circulação e quartos; juntas de topo desencontradas ≥ 30 cm.','Juntas de dilatação com perfil T sob as portas dos quartos e na passagem sala/circulação (vermelho); perfil de transição nas divisas com cerâmica (azul).','Conferir a folga inferior das portas: se < 12 mm, rebaixar as folhas; deixar 10 mm de folga em todo o perímetro, coberta pelo rodapé.','Cozinha, área, banheiros e varanda mantêm o piso atual (revisar rejunte).']));
+  sheets.push(sheet(7,'Paginação de piso: laminado e rodapé','1:50 · det. 1:5',b,['LM-01 instalado flutuante sobre o porcelanato atual (sem demolição), com manta de 2 mm; desnível total ~10 mm.','Réguas no sentido do comprimento da sala (paralelas à luz da varanda), contínuas por circulação e quartos; juntas de topo desencontradas ≥ 30 cm.','Juntas de dilatação com perfil T sob as portas dos quartos e na passagem sala/circulação (vermelho); perfil de transição nas divisas com cerâmica (azul).','Conferir a folga inferior das portas: se < 12 mm, rebaixar as folhas; deixar 10 mm de folga em todo o perímetro, coberta pelo rodapé.','Cozinha, área, banheiros e varanda mantêm o piso atual (revisar rejunte).']));
 })();
 
 // 06 — Pintura
@@ -378,7 +399,7 @@ const IMG=n=>`imagens/${n}.jpg`;
   { const a=PROP.arco, k=20, x0=368, fy=y+50, r=a.w/2*k; b+=L(x0-8,fy,x0+a.w*k+8,fy,'#222',0.3);
     b+=`<path d="M${x0},${fy-0.1*k} L${x0},${n1(fy-(a.h-a.w/2)*k)} A${n1(r)},${n1(r)} 0 0 1 ${n1(x0+a.w*k)},${n1(fy-(a.h-a.w/2)*k)} L${n1(x0+a.w*k)},${fy-0.1*k} Z" fill="${PAL['PT-04'].hex}" stroke="#555" stroke-width="0.2"/>`;
     b+=dim(x0,fy,x0+a.w*k,fy,4,F(a.w))+dim(x0+a.w*k,fy,x0+a.w*k,fy-a.h*k,-4,F(a.h)); b+=T(x0,fy+8,'base a 0,10 m (acima do rodapé)',{s:1.7,c:'#555'}); }
-  sheets.push(sheet(6,'Pintura e acabamentos de parede','1:50',b,['Preparo: lixar, tratar fissuras e furos com massa acrílica, fundo preparador onde houver manchas; 2 demãos (3 no verde-sálvia).','Cores de referência por HEX: aprovar a amostra pintada na parede (prova de 50 × 50 cm) antes de comprar o total.','Portas e batentes em mogno: manter, lixar leve e aplicar verniz acetinado (revitalização). Azulejos da cozinha, área e banheiros: manter, com revisão de rejunte.','Arco PT-04: marcar o eixo da mesa, traçar o semicírculo com barbante e lápis, recortar com fita crepe de pintura.']));
+  sheets.push(sheet(8,'Pintura e acabamentos de parede','1:50',b,['Preparo: lixar, tratar fissuras e furos com massa acrílica, fundo preparador onde houver manchas; 2 demãos (3 no verde-sálvia).','Cores de referência por HEX: aprovar a amostra pintada na parede (prova de 50 × 50 cm) antes de comprar o total.','Portas e batentes em mogno: manter, lixar leve e aplicar verniz acetinado (revitalização). Azulejos da cozinha, área e banheiros: manter, com revisão de rejunte.','Arco PT-04: marcar o eixo da mesa, traçar o semicírculo com barbante e lápis, recortar com fita crepe de pintura.']));
 })();
 
 // 07 — Cozinha: planta e elevações
@@ -433,7 +454,7 @@ const IMG=n=>`imagens/${n}.jpg`;
   // legenda de módulos
   const t=tableSVG(262,14,[{h:'MÓD',w:9,b:1},{h:'DESCRIÇÃO',w:62,wrap:58},{h:'L × P (cm)',w:20,a:'end',mono:true}],PROP.cozinha.map(m=>[m.id,m.nome,`${Math.round((m.b-m.a)*100)} × ${Math.round(m.dep*100)}`]),{fs:1.7,rh:3.4});
   b+=t.s;
-  sheets.push(sheet(7,'Cozinha: planta e elevações','1:25',b,['Marcenaria em MDF 18 mm branco TX (MD-02) com puxador cava; caixas em MDF branco 15 mm; rodapé recuado 5 cm; dobradiças com amortecedor e corrediças telescópicas.','Bancadas e frontão em porcelanato PC-01 (meia-esquadria, saia aparente de 4 cm), frontão assentado sobre o azulejo existente com argamassa AC-III.','Vão do fogão: 77 cm livres; lava-louças: 60 cm livres sob a bancada, com 82–87 cm de altura útil. Conferir as fichas técnicas antes do corte.']));
+  sheets.push(sheet(9,'Cozinha: planta e elevações','1:25',b,['Marcenaria em MDF 18 mm branco TX (MD-02) com puxador cava; caixas em MDF branco 15 mm; rodapé recuado 5 cm; dobradiças com amortecedor e corrediças telescópicas.','Bancadas e frontão em porcelanato PC-01 (meia-esquadria, saia aparente de 4 cm), frontão assentado sobre o azulejo existente com argamassa AC-III.','Vão do fogão: 77 cm livres; lava-louças: 60 cm livres sob a bancada, com 82–87 cm de altura útil. Conferir as fichas técnicas antes do corte.']));
 })();
 
 // 08 — Cozinha: eletros e detalhes
@@ -468,7 +489,7 @@ const IMG=n=>`imagens/${n}.jpg`;
   b+=T(fx,fy2,'MATERIAIS E FERRAGENS',{s:2.6,w:700,ls:0.3}); fy2+=4;
   const mat=[['Caixas','MDF branco 15 mm, fundo 6 mm; aéreos com fundo 15 mm (fixação com parafuso e bucha 8 mm a cada 40 cm)'],['Frentes','MDF branco TX 18 mm (MD-02), fosco; puxador cava usinado (base: superior; aéreo: inferior)'],['Nicho do café','MDF freijó (MD-01) com fundo ripado 3 × 1,8 cm a cada 1,5 cm; fita LED sob a base superior'],['Ferragens','Dobradiças 35 mm com amortecedor; corrediças telescópicas 45 cm com amortecedor; pistão a gás nos basculantes'],['Bancada','Porcelanato PC-01 polido ou acetinado, placas grandes (mín. 120 × 120), corte e colagem por marmoraria especializada'],['Cuba','Embutir por baixo (subtop) com recorte polido; silicone neutro antifungo'],['Proteções','Fita de borda 1 mm em todas as faces aparentes; painel lateral de 18 mm no nicho da geladeira']];
   t=tableSVG(fx,fy2,[{h:'ITEM',w:24,b:1},{h:'ESPECIFICAÇÃO',w:150,wrap:120}],mat,{fs:2,rh:4.2}); b+=t.s;
-  sheets.push(sheet(8,'Cozinha: eletros, materiais e detalhes','indicada',b,['Dimensões dos eletros são faixas de referência de mercado para os itens pedidos; a marcenaria só deve ser cortada com o modelo comprado em mãos.','Lava-louças de 15 serviços tem 60 cm: por isso entra sob a bancada norte, entre o gaveteiro e o canto, ligada pela pia.','A torre (C3) e o nicho da geladeira sobem até 2,40 m; os 20 cm até o teto ficam livres para ventilação.']));
+  sheets.push(sheet(10,'Cozinha: eletros, materiais e detalhes','indicada',b,['Dimensões dos eletros são faixas de referência de mercado para os itens pedidos; a marcenaria só deve ser cortada com o modelo comprado em mãos.','Lava-louças de 15 serviços tem 60 cm: por isso entra sob a bancada norte, entre o gaveteiro e o canto, ligada pela pia.','A torre (C3) e o nicho da geladeira sobem até 2,40 m; os 20 cm até o teto ficam livres para ventilação.']));
 })();
 
 // 09 — Banheiro social
@@ -496,7 +517,7 @@ const IMG=n=>`imagens/${n}.jpg`;
   const t=tableSVG(262,24,[{h:'CÓD',w:10,b:1},{h:'ESPECIFICAÇÃO',w:105,wrap:86},{h:'DIM.',w:28,wrap:20}],rows,{fs:1.95,rh:4});
   b+=t.s;
   b+=TW(262,24+t.h+7,'Por que essas escolhas: a bancada de porcelanato com saia dá o visual de pedra pagando bem menos; a cuba de apoio dispensa recorte complexo; o espelho de parede a parede amplia o banheiro de 2,90 m²; e os metais pretos conversam com a faixa de granito preto que já existe nas paredes.',62,{s:2.2,c:'#333',lh:3});
-  sheets.push(sheet(9,'Banheiro social: planta, elevação e detalhes','1:25 · 1:20',b,['Retirar o gabinete atual com cuidado para preservar o azulejo; os furos ficam cobertos pelo espelho.','Gabinete suspenso fixado em mão-francesa oculta ou parafusos 10 mm com bucha; MDF resistente à umidade (BP/RU) com fita de borda nas quatro faces.','Bancada com caimento zero e furo de 35 mm para o misturador; vedação com silicone neutro antifungo.']));
+  sheets.push(sheet(11,'Banheiro social: planta, elevação e detalhes','1:25 · 1:20',b,['Retirar o gabinete atual com cuidado para preservar o azulejo; os furos ficam cobertos pelo espelho.','Gabinete suspenso fixado em mão-francesa oculta ou parafusos 10 mm com bucha; MDF resistente à umidade (BP/RU) com fita de borda nas quatro faces.','Bancada com caimento zero e furo de 35 mm para o misturador; vedação com silicone neutro antifungo.']));
 })();
 
 // 10 — Sala: marcenaria e cortina
@@ -533,7 +554,7 @@ const IMG=n=>`imagens/${n}.jpg`;
   const rows=[['MC-01','Painel ripado em freijó','120 × 260 cm','MDF freijó 18 mm de base + ripas MDF 2 × 4 cm coladas e pregadas; fixação com cola PU e parafusos ocultos'],['MC-02','Rack suspenso em freijó','180 × 40 × 30 cm','2 basculantes com pistão + nicho central aberto; fixação com perfil oculto; passa-fio para a TV; fita LED L-04 sob a base'],['MC-03','Aparador em freijó','160 × 40 × 78 cm','Pés palito em metal preto; 3 portas (laterais com palhinha natural sobre requadro); 1 prateleira interna'],['D-05','Cortina','3,00 × 2,36 m','Linho misto off-white, prega wave, trilho suíço embutido; abre para o lado da divisa; opcional blackout no forro']];
   const t=tableSVG(215,170,[{h:'CÓD',w:10,b:1},{h:'PEÇA',w:30,wrap:24},{h:'DIM.',w:24,wrap:18},{h:'ESPECIFICAÇÃO',w:134,wrap:110}],rows,{fs:2,rh:4.2});
   b+=t.s;
-  sheets.push(sheet(10,'Sala: painel, rack, aparador e cortina','1:25 · det. 1:10',b,['Passar os cabos da TV por conduíte flexível atrás do painel ripado até a caixa TO-09.','Fixar o rack em parede de alvenaria com parafusos 8 mm; se a parede de divisa for de drywall, usar reforço interno.','Tom do freijó do rack, painel, aparador e nicho do café: mesmo padrão e mesmo fornecedor, para não variar a cor.']));
+  sheets.push(sheet(12,'Sala: painel, rack, aparador e cortina','1:25 · det. 1:10',b,['Passar os cabos da TV por conduíte flexível atrás do painel ripado até a caixa TO-09.','Fixar o rack em parede de alvenaria com parafusos 8 mm; se a parede de divisa for de drywall, usar reforço interno.','Tom do freijó do rack, painel, aparador e nicho do café: mesmo padrão e mesmo fornecedor, para não variar a cor.']));
 })();
 
 // 11 — Mobiliário e decoração
@@ -543,7 +564,7 @@ const IMG=n=>`imagens/${n}.jpg`;
   const t=tableSVG(22,14,[{h:'CÓD',w:12,b:1},{h:'AMBIENTE',w:26},{h:'ITEM',w:132,wrap:112},{h:'DIMENSÕES',w:80,wrap:64},{h:'OBSERVAÇÃO',w:126,wrap:100}],rows,{fs:2.15,rh:4.6});
   let b=t.s;
   b+=TW(22,14+t.h+8,'Critério de compra: priorizar as peças de maior uso e que definem o espaço (sofá, mesa e cadeiras, tapete); peças de decoração (quadros, vasos, abajur) podem entrar depois, mantendo a paleta: madeira clara, linho, palha, verde-sálvia e argila.',150,{s:2.4,c:'#333',lh:3.3});
-  sheets.push(sheet(11,'Mobiliário e decoração','—',b,['Dimensões de referência: aceitar variação de até ±5 cm mantendo as circulações da prancha 02.','Luminárias de mesa e piso (L-05, L-06) na prancha 04.']));
+  sheets.push(sheet(13,'Mobiliário e decoração','—',b,['Dimensões de referência: aceitar variação de até ±5 cm mantendo as circulações da prancha 04.','Luminárias de mesa e piso (L-05, L-06) na prancha 06.']));
 })();
 
 // 12 — Especificações e sequência
@@ -558,11 +579,11 @@ const IMG=n=>`imagens/${n}.jpg`;
   seq.forEach((s0,i)=>{ b+=C(sx+2.6,sy-0.9,2.6,{f:'#1D232A',s:'none'})+T(sx+2.6,sy+0.1,String(i+1),{s:2.4,w:700,a:'middle',c:'#fff'}); const lines=wrap(s0,82); lines.forEach((l,j)=>{ b+=T(sx+8,sy+j*3.2,l,{s:2.3}); }); sy+=Math.max(7,lines.length*3.2+3.2); });
   sy+=3; b+=T(sx,sy,'NOTAS GERAIS',{s:2.8,w:700,ls:0.3}); sy+=5;
   ['Este caderno não inclui alterações estruturais nem de alvenaria. Serviços elétricos e de gás devem ser executados por profissionais habilitados, seguindo a NBR 5410 e as normas da concessionária.','Para obra em condomínio, comunicar a administração e, se exigido, registrar responsável técnico (RRT/ART) com o projeto.','Cores, padrões de madeira e porcelanato: aprovar amostras físicas antes da compra.'].forEach(n=>{ const ls=wrap(n,86); ls.forEach((l,j)=>b+=T(sx,sy+j*3.1,l,{s:2.2,c:'#333'})); sy+=ls.length*3.1+2; });
-  sheets.push(sheet(12,'Especificações, quantitativos e sequência','—',b,['Quantitativos calculados a partir da planta: arredondar para a embalagem comercial na compra.','Itens de mobiliário e eletros: ver pranchas 08 e 11.']));
+  sheets.push(sheet(14,'Especificações, quantitativos e sequência','—',b,['Quantitativos calculados a partir da planta: arredondar para a embalagem comercial na compra.','Itens de mobiliário e eletros: ver pranchas 10 e 13.']));
 })();
 
 document.getElementById('main').innerHTML=sheets.join('');
-const titles=['Capa','Layout','Pontos','Iluminação','Piso','Pintura','Cozinha A','Cozinha B','Banheiro','Sala','Mobiliário','Especificações'];
+const titles=['Capa','Perspectivas sala','Perspectivas cozinha','Layout','Pontos','Iluminação','Piso','Pintura','Cozinha A','Cozinha B','Banheiro','Sala','Mobiliário','Especificações'];
 document.getElementById('nav').innerHTML=titles.map((t,i)=>`<a href="#f${i+1}">${String(i+1).padStart(2,'0')} ${t}</a>`).join('');
 window.__sheetsReady=true;
 })();

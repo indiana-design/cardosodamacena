@@ -84,6 +84,7 @@ h2 span{font-family:var(--font-body);font-size:11.5px;letter-spacing:0;text-tran
 .sw input:disabled+i{opacity:.4}
 .seg2{grid-template-columns:repeat(2,1fr)}
 .sheets{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px;padding:10px 12px;border-radius:8px;background:var(--ink);color:var(--panel);font:600 13px/1.2 var(--font-body);text-decoration:none}
+.sheets.alt{margin-top:6px;background:var(--panel-2);color:var(--ink);border:1px solid var(--line)}
 .sheets:hover{opacity:.9} .sheets:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .sw-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .sw-row div{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);min-width:0}
@@ -189,6 +190,7 @@ h2 span{font-family:var(--font-body);font-size:11.5px;letter-spacing:0;text-tran
     </div>
     <div id="fin-prop">
     <a class="sheets" href="projeto.html" target="_blank" rel="noopener">Abrir o projeto executivo (pranchas) <span aria-hidden="true">→</span></a>
+    <a class="sheets alt" href="projeto.html#f2" target="_blank" rel="noopener">Ver as imagens realistas <span aria-hidden="true">→</span></a>
     <h2>Proposta <span>resumo</span></h2>
     <div class="sw-row" id="swatches"></div>
     <ul class="fin">
@@ -707,7 +709,7 @@ function buildStatic(){
   B([14.45,0.59,15.12,0.62],0,2.10,M.steel); B([15.62,0.59,16.29,0.62],0,2.10,M.steel);
   // sombra no "chão" do palco
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(120,120), new THREE.ShadowMaterial({opacity:0.16}));
-  ground.rotation.x=-Math.PI/2; ground.position.set(8,-0.161,4); ground.receiveShadow=true; gStatic.add(ground);
+  ground.name='ground'; ground.rotation.x=-Math.PI/2; ground.position.set(8,-0.161,4); ground.receiveShadow=true; gStatic.add(ground);
   // teto (só no modo caminhar)
   target=gCeil;
   const s=toShape(OUTLINE);
@@ -1024,7 +1026,7 @@ function faceBox(f,a,b,z0,z1,mat,t=0.004,off=0.001){
 function blob(cx,cy,rx,ry,z=0.003,op=0.35){ // sombra de contato suave
   if(!blob.tex){ const [c,g]=canvasOf(128,128), gr=g.createRadialGradient(64,64,0,64,64,64); gr.addColorStop(0,'rgba(0,0,0,1)'); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(0,0,128,128); blob.tex=new THREE.CanvasTexture(c); }
   const m=new THREE.Mesh(new THREE.PlaneGeometry(rx*2,ry*2), new THREE.MeshBasicMaterial({map:blob.tex, transparent:true, opacity:op, depthWrite:false, color:0x000000}));
-  m.rotation.x=-Math.PI/2; m.position.set(cx,z,cy); target.add(m); return m;
+  m.name='blob'; m.rotation.x=-Math.PI/2; m.position.set(cx,z,cy); target.add(m); return m;
 }
 function leafShape(L,W,notch){ const s=new THREE.Shape(); s.moveTo(0,0);
   s.bezierCurveTo(W*0.9,L*0.15,W*0.7,L*0.85,0,L); s.bezierCurveTo(-W*0.7,L*0.85,-W*0.9,L*0.15,0,0);
@@ -1732,6 +1734,7 @@ window.__apt={
   setMode,
   select(id){ selectRoom2D(id,true); },
   pause(on){ paused=on; },
+  three:{scene,M,gLabels,gLamps,gFurn,gOld,gOldCeil,renderer},
   renderOnce(){ if(tween) stepTween(performance.now()+1e7); if(mode==='walk') updateWalk(0); else controls.update(); renderer.render(scene,camera); labelRenderer.render(scene,camera); },
   ready:true
 };
