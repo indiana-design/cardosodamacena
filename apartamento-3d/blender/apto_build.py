@@ -356,7 +356,7 @@ def build_walls():
         if r == 'varanda': k = 'pastilha_a' if abs(-c.y) < 0.01 and n.y < 0 else 'pastilha_b'
         if r in ('sala', 'suite', 'quarto2', 'circ', 'quarto1', 'qemp', 'hall'):
             pn = (n.x, -n.y)          # normal na planta
-            for cod, key in (('PT-03', 'salvia'), ('PT-05', 'greige'), ('PT-06', 'nevoa')):
+            for cod, key in (('PT-05', 'greige'), ('PT-06', 'nevoa')):
                 f = faces[cod]
                 if f['ax'] == 'x' and abs(-c.y - f['c']) < 0.01 and f['a'] - 0.01 <= c.x <= f['b'] + 0.01 and pn[1] * f['n'] > 0.5: k = key
                 if f['ax'] == 'y' and abs(c.x - f['c']) < 0.01 and f['a'] - 0.01 <= -c.y <= f['b'] + 0.01 and pn[0] * f['n'] > 0.5: k = key
@@ -379,11 +379,11 @@ def build_door(w, o, gi):
     d0, d1 = (y0, y1) if alongX else (x0, x1); th = d1 - d0; dc = (d0 + d1) / 2
     cn = f'porta_{gi}'; hd = 2.10
     # batentes e alizares
-    for u0, u1 in ((a, a + 0.03), (b - 0.03, b)): box(cn + '_bat', *place(alongX, u0, u1, d0 - 0.008, d1 + 0.008, 0, hd), M['mogno'], 'portas')
-    box(cn + '_bat', *place(alongX, a, b, d0 - 0.008, d1 + 0.008, hd - 0.03, hd), M['mogno'], 'portas')
+    for u0, u1 in ((a, a + 0.03), (b - 0.03, b)): box(cn + '_bat', *place(alongX, u0, u1, d0 - 0.008, d1 + 0.008, 0, hd), M['imbuia'], 'portas')
+    box(cn + '_bat', *place(alongX, a, b, d0 - 0.008, d1 + 0.008, hd - 0.03, hd), M['imbuia'], 'portas')
     for dd in (d0 - 0.018, d1 + 0.003):
-        for u0, u1 in ((a - 0.06, a), (b, b + 0.06)): box(cn + '_ali', *place(alongX, u0, u1, dd, dd + 0.015, 0, hd + 0.06), M['mogno'], 'portas', bevel=0.004)
-        box(cn + '_ali', *place(alongX, a - 0.06, b + 0.06, dd, dd + 0.015, hd, hd + 0.06), M['mogno'], 'portas', bevel=0.004)
+        for u0, u1 in ((a - 0.06, a), (b, b + 0.06)): box(cn + '_ali', *place(alongX, u0, u1, dd, dd + 0.015, 0, hd + 0.06), M['imbuia'], 'portas', bevel=0.004)
+        box(cn + '_ali', *place(alongX, a - 0.06, b + 0.06, dd, dd + 0.015, hd, hd + 0.06), M['imbuia'], 'portas', bevel=0.004)
     # folha
     key = (round(a, 2), ('y' if alongX else 'x') + f'{(y0 if alongX else x0):.2f}')
     ang = DOOR_OPEN.get(key, 0)
@@ -478,7 +478,7 @@ def build_floors():
     box('SANCA_LED', 2.61, 2.625, 0.02, 2.95, 2.385, 2.40, M['led'], 'luz')
 
 def build_baseboards(walls):
-    """rodapé branco (RD-01) em todas as faces de parede dos cômodos com laminado."""
+    """rodapé de madeira existente (mogno escuro / imbuia avermelhada, 7 cm) nas faces de parede dos cômodos com laminado."""
     me = walls.data; bm = bmesh.new()
     for p in me.polygons:
         n = p.normal
@@ -490,7 +490,7 @@ def build_baseboards(walls):
         if len(bot) < 2: continue
         a = min(bot, key=lambda v: (v.x, v.y)); b = max(bot, key=lambda v: (v.x, v.y))
         if (b - a).length < 0.05: continue
-        t = Vector((n.x, n.y, 0)).normalized() * 0.012; h = 0.10
+        t = Vector((n.x, n.y, 0)).normalized() * 0.015; h = 0.07
         q = [a, b, b + t, a + t]
         vb = [bm.verts.new((v.x, v.y, 0.012)) for v in q]; vt = [bm.verts.new((v.x, v.y, 0.012 + h)) for v in q]
         bm.faces.new(vt); bm.faces.new([vb[1], vb[2], vt[2], vt[1]]); bm.faces.new([vb[2], vb[3], vt[3], vt[2]]); bm.faces.new([vb[0], vb[3], vt[3], vt[0]][::-1])
@@ -577,129 +577,226 @@ def soft_box(name, x0, x1, y0, y1, z0, z1, mat, r=0.03, collection='moveis'):
     ob = box(name, x0, x1, y0, y1, z0, z1, mat, collection, bevel=r, seg=4, smooth=True)
     return ob
 
+# ---------------------------------------------------------------- sala v2 (ajuste de 18/11)
+# Pedido: sofá retrátil grande, sem mesa de centro; nada no caminho da entrada (sem aparador, espelho redondo
+# ou pintura em arco); mesa de 6 lugares redonda ou retangular; rodapés e batentes em mogno escuro/imbuia;
+# opção A com paredes neutras (PT-01) e opção B com a parede da TV em verde-oliva.
+OPCAO = ARGS[ARGS.index('--opcao') + 1] if '--opcao' in ARGS else 'A-redonda'
+PAREDE, MESA = OPCAO.split('-')
+VERDE_OLIVA = '#767B65'
+M['verde_oliva'] = paint('PT07', VERDE_OLIVA)
+M['sofa'] = mat_tex('SOFA_LINHO', 'rough_linen', 0.27, tint='#C9BCA7', mix=0, rough=0.93, nor=0.9, Sheen_Weight=0.4)
+M['almof_terracota'] = mat_tex('ALMOFADA_TERRACOTA', 'rough_linen', 0.22, tint='#8E4429', mix=0, rough=0.95, nor=0.9, Sheen_Weight=0.4)
+M['almof_oliva'] = mat_tex('ALMOFADA_OLIVA', 'ribbed_corduroy', 0.27, tint='#5E6545', mix=0, rough=0.9, nor=0.8, Sheen_Weight=0.5)
+M['almof_creme'] = mat_tex('ALMOFADA_BOUCLE', 'curly_teddy_natural', 0.33, tint='#EDE4D3', mix=0, rough=0.97, nor=1.0, Sheen_Weight=0.5)
+M['manta_trico'] = mat_tex('MANTA_TRICO', 'knitted_fleece', 0.70, tint='#87402A', mix=0, rough=0.95, nor=1.0, Sheen_Weight=0.4)
+M['juta'] = mat_tex('TAPETE_JUTA', 'hessian_230', 0.80, tint='#B39167', mix=0, rough=0.97, nor=1.0)
+M['boucle_cad'] = mat_tex('CADEIRA_BOUCLE', 'curly_teddy_natural', 0.33, tint='#EAE1D0', mix=0, rough=0.97, nor=1.0, Sheen_Weight=0.5)
+M['pendente_oliva'] = mat_color('PENDENTE_OLIVA', '#5F664B', 0.45, metal=0.3)
+M['branco_fosco'] = mat_color('BRANCO_FOSCO', '#F2F0EA', 0.6)
+M['lampada'] = mat_emit('LAMPADA_2700K', (1.0, 0.72, 0.45), 0.0)
+M['rodape'] = mat_tex('RODAPE_IMBUIA', 'sapele_veneer', 0.9, rough=0.4, nor=0.2, hsv=(0.5, 0.9, 0.30), Coat_Weight=0.25, Coat_Roughness=0.3)
+M['imbuia'] = M['rodape']
+
+def translucent(mat, amount, transparent=0.0):
+    """mistura translucidez (e transparência) a um material Principled: cúpulas e voal."""
+    nt = mat.node_tree; N, L = nt.nodes, nt.links; b = nt.nodes['Principled BSDF']; o = nt.nodes['Material Output']
+    tr = N.new('ShaderNodeBsdfTranslucent'); src = b.inputs['Base Color']
+    if src.is_linked: L.new(src.links[0].from_socket, tr.inputs['Color'])
+    else: tr.inputs['Color'].default_value = src.default_value
+    m1 = N.new('ShaderNodeMixShader'); m1.inputs[0].default_value = amount; L.new(b.outputs[0], m1.inputs[1]); L.new(tr.outputs[0], m1.inputs[2]); out = m1.outputs[0]
+    if transparent:
+        tp = N.new('ShaderNodeBsdfTransparent'); m2 = N.new('ShaderNodeMixShader'); m2.inputs[0].default_value = transparent
+        L.new(out, m2.inputs[1]); L.new(tp.outputs[0], m2.inputs[2]); out = m2.outputs[0]
+    L.new(out, o.inputs['Surface']); return mat
+M['voal'] = translucent(mat_tex('VOAL_LINHO', 'rough_linen', 0.20, tint='#F3EFE7', mix=0, rough=0.95, nor=0.4), 0.45, 0.42)
+translucent(M['cupula'], 0.5)
+
+LIGHTS_ON = []
+def point_light(name, x, y, z, watts, color=(1.0, 0.70, 0.45), size=0.03):
+    ld = bpy.data.lights.new(name, 'POINT'); ld.energy = watts; ld.color = color; ld.shadow_soft_size = size
+    ob = bpy.data.objects.new(name, ld); coll('luz').objects.link(ob); ob.location = P(x, y, z); LIGHTS_ON.append((ld, watts)); return ob
+
+def tilt_x(ob, pivot, deg):
+    pv = P(*pivot); ob.matrix_world = Matrix.Translation(pv) @ Matrix.Rotation(math.radians(deg), 4, 'X') @ Matrix.Translation(-pv) @ ob.matrix_world
+
+def pillow(name, cx, cy, z, w, h, t, mat, yaw=0.0, tilt=14.0):
+    """almofada: esfera achatada puxada para um cubo (modificador Cast)."""
+    bm = bmesh.new(); bmesh.ops.create_uvsphere(bm, u_segments=40, v_segments=20, radius=0.5)
+    for v in bm.verts: v.co = Vector((v.co.x * w, v.co.y * t, v.co.z * h))
+    ob = mesh_obj(name, bm, mat, 'moveis'); ob.data.shade_smooth()
+    cs = ob.modifiers.new('cast', 'CAST'); cs.cast_type = 'CUBOID'; cs.factor = 0.62
+    ob.matrix_world = Matrix.Translation(P(cx, cy, z)) @ Matrix.Rotation(math.radians(yaw), 4, 'Z') @ Matrix.Rotation(math.radians(tilt), 4, 'X')
+    return ob
+
+def build_sofa_retratil(x0, x1, yb, depth):
+    """sofá retrátil e reclinável de 3 módulos (fechado), encostado na parede yb, frente para −y."""
+    yf = yb - depth; arm = 0.18; mat = M['sofa']
+    box('SOFA_RODAPE', x0 + 0.06, x1 - 0.06, yf + 0.10, yb - 0.06, 0.0, 0.06, M['grafite'], 'moveis')
+    soft_box('SOFA_BASE', x0 + arm - 0.01, x1 - arm + 0.01, yf + 0.02, yb - 0.02, 0.06, 0.36, mat, 0.03)
+    for xa, xb in ((x0, x0 + arm), (x1 - arm, x1)): soft_box('SOFA_BRACO', xa, xb, yf, yb, 0.04, 0.62, mat, 0.07)
+    soft_box('SOFA_CAIXA_ENCOSTO', x0 + arm, x1 - arm, yb - 0.24, yb, 0.34, 0.66, mat, 0.04)
+    n = 3; w = (x1 - x0 - 2 * arm) / n
+    for i in range(n):
+        a = x0 + arm + i * w; c = a + w / 2
+        soft_box('SOFA_ASSENTO', a + 0.004, a + w - 0.004, yf + 0.012, yb - 0.30, 0.35, 0.50, mat, 0.065)
+        ob = soft_box('SOFA_ENCOSTO', a + 0.008, a + w - 0.008, yb - 0.44, yb - 0.22, 0.47, 0.83, mat, 0.085); tilt_x(ob, (c, yb - 0.33, 0.50), 9)
+        ob = soft_box('SOFA_CABECAL', a + 0.008, a + w - 0.008, yb - 0.42, yb - 0.22, 0.80, 1.00, mat, 0.075); tilt_x(ob, (c, yb - 0.32, 0.80), 5)
+    return yf
+
+def throw_blanket(name, x0, x1, yb, yf, zs, zb, mat):
+    """manta de tricô sobre o assento, dobrando na quina e caindo pela frente."""
+    prof = [(yb - (yb - yf) * t, zs + 0.012) for t in [i / 14 for i in range(15)]]
+    r = 0.05
+    for i in range(1, 9):
+        a = math.pi / 2 * i / 8; prof.append((yf - r * math.sin(a) + 0.0, zs + 0.012 - r + r * math.cos(a)))
+    for i in range(1, 13): prof.append((yf - r - 0.004 * i, zs - r - (zs - r - zb) * i / 12))
+    nx = 28; bm = bmesh.new(); grid = []
+    for j, (yy, zz) in enumerate(prof):
+        row = []; hang = max(0.0, (zs - zz) / max(zs - zb, 1e-3))
+        for i in range(nx + 1):
+            t = i / nx; x = x0 + (x1 - x0) * t
+            dy = -hang * 0.035 * math.sin(t * math.pi * 5 + 0.7) - hang * 0.02 * math.sin(t * math.pi * 11)
+            row.append(bm.verts.new(P(x, yy + dy, zz + 0.006 * math.sin(t * math.pi * 3) * (1 - hang))))
+        grid.append(row)
+    for j in range(len(grid) - 1):
+        for i in range(nx): bm.faces.new([grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i]])
+    ob = mesh_obj(name, bm, mat, 'moveis'); ob.data.shade_smooth()
+    ob.modifiers.new('esp', 'SOLIDIFY').thickness = 0.014; sub = ob.modifiers.new('sub', 'SUBSURF'); sub.levels = 1; sub.render_levels = 2
+    return ob
+
+def build_curtains(x, panels, z0, z1, depth=0.09, pleat=0.11):
+    for k, (ya, yb_) in enumerate(panels):
+        n = max(8, int((yb_ - ya) / (pleat / 4))); bm = bmesh.new(); rows = []
+        for i in range(n + 1):
+            t = i / n; y = ya + (yb_ - ya) * t; xx = x + depth / 2 * math.sin((y - ya) / pleat * 2 * math.pi)
+            rows.append((bm.verts.new(P(xx, y, z0)), bm.verts.new(P(xx, y, z1))))
+        for i in range(n): bm.faces.new([rows[i][0], rows[i + 1][0], rows[i + 1][1], rows[i][1]])
+        ob = mesh_obj(f'CORTINA_VOAL_{k}', bm, M['voal'], 'moveis', uvrot=math.pi / 2); ob.data.shade_smooth()
+        ob.modifiers.new('esp', 'SOLIDIFY').thickness = 0.003
+        sub = ob.modifiers.new('sub', 'SUBSURF'); sub.levels = 1; sub.render_levels = 2
+
+def build_dining_chair(px, py, face_deg):
+    """cadeira de jantar estofada em bouclé creme, pés de freijó; olha para face_deg (planta)."""
+    parts = []; w, d, hs = 0.47, 0.50, 0.47
+    for lx in (-w / 2 + 0.035, w / 2 - 0.035):
+        for ly in (-d / 2 + 0.035, d / 2 - 0.035):
+            ob = cyl('CAD_PE', px + lx, py + ly, 0.0, hs - 0.06, 0.016, 0.022, M['freijo'], 16); parts.append(ob)
+    parts.append(soft_box('CAD_ASSENTO', px - w / 2, px + w / 2, py - d / 2, py + d / 2, hs - 0.07, hs + 0.02, M['boucle_cad'], 0.035))
+    ob = soft_box('CAD_ENCOSTO', px - w / 2 + 0.01, px + w / 2 - 0.01, py - d / 2 - 0.01, py - d / 2 + 0.06, hs + 0.0, hs + 0.40, M['boucle_cad'], 0.03)
+    tilt_x(ob, (px, py - d / 2, hs), -8); parts.append(ob)
+    for ob in parts: rot_obj(ob, (px, py), face_deg - 90)
+
+def pendant_dome(name, cx, cy, zb, r, drop_to=H):
+    bm = bmesh.new(); bmesh.ops.create_uvsphere(bm, u_segments=64, v_segments=32, radius=r)
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if v.co.z < -1e-4], context='VERTS')
+    for v in bm.verts: v.co = Vector((v.co.x, v.co.y, v.co.z * 0.72)) + P(cx, cy, zb)
+    ob = mesh_obj(name, bm, [M['pendente_oliva'], M['branco_fosco']], 'moveis'); ob.data.shade_smooth()
+    sl = ob.modifiers.new('esp', 'SOLIDIFY'); sl.thickness = 0.004; sl.material_offset = 1; sl.offset = -1
+    cyl(name + '_CABO', cx, cy, zb + r * 0.72, drop_to, 0.003, mat=M['preto'], seg=8, smooth=False)
+    cyl(name + '_CANOPLA', cx, cy, drop_to - 0.02, drop_to, 0.05, mat=M['preto'], seg=32)
+    bm = bmesh.new(); bmesh.ops.create_uvsphere(bm, u_segments=24, v_segments=12, radius=0.045, matrix=Matrix.Translation(P(cx, cy, zb + 0.06)))
+    mesh_obj(name + '_LAMPADA', bm, M['lampada'], 'luz').data.shade_smooth()
+    point_light(name + '_LUZ', cx, cy, zb + 0.06, 18)
+
 def build_living():
     it = ITEMS
-    # MC-01 painel ripado (ripas 2×4 cm a cada 1,5 cm) e fundo
-    x0, y0, x1, y1 = it['MC-01']['r']; bm = bmesh.new(); x = x0
-    while x + 0.02 <= x1 + 1e-6:
-        bm_box(bm, x, x + 0.02, 0.0, 0.035, 0.0, H); x += 0.035
-    mesh_obj('MC01_RIPADO', bm, M['freijo'], 'moveis')
-    # MC-02 rack suspenso: caixa freijó, 2 basculantes e nicho central
-    rx0, ry0, rx1, ry1 = it['MC-02']['r']; z0, z1 = it['MC-02']['z']
-    box('MC02_RACK', rx0, rx1, ry0, ry1 - 0.02, z0, z1, M['freijo'], 'moveis', bevel=0.003)
-    w3 = (rx1 - rx0) / 3
-    for i in range(3):
-        a, b = rx0 + i * w3 + 0.002, rx0 + (i + 1) * w3 - 0.002
-        if i == 1:
-            box('MC02_NICHO', a + 0.018, b - 0.018, ry1 - 0.30, ry1 - 0.019, z0 + 0.018, z1 - 0.018, M['grafite'], 'moveis')
-        else:
-            box('MC02_FRENTE', a, b, ry1 - 0.02, ry1, z0 + 0.003, z1 - 0.003, M['freijo'], 'moveis', bevel=0.002)
-    box('L04_FITA', rx0 + 0.05, rx1 - 0.05, ry0 + 0.15, ry0 + 0.17, z0 - 0.004, z0, M['led'], 'luz')
-    # E-01 TV 55"
-    tv = it['E-01']; cx = tv['cx']; tz0, tz1 = tv['z']
-    box('E01_TV', cx - 0.615, cx + 0.615, 0.04, 0.065, tz0, tz1, M['preto'], 'moveis', bevel=0.004)
-    box('E01_TELA', cx - 0.605, cx + 0.605, 0.0655, 0.0665, tz0 + 0.01, tz1 - 0.01, M['tv'], 'moveis')
-    # M-01 sofá 3 lugares em linho, braço reto e pés de madeira
-    sx0, sy0, sx1, sy1 = it['M-01']['r']
-    for lx in (sx0 + 0.07, sx1 - 0.07):
-        for ly in (sy0 + 0.07, sy1 - 0.07): cyl('M01_PE', lx, ly, 0.0, 0.13, 0.022, 0.016, M['madeira_pe'], 16)
-    soft_box('M01_BASE', sx0 + 0.01, sx1 - 0.01, sy0 + 0.02, sy1 - 0.01, 0.12, 0.40, M['linho'], 0.03)
-    for xa, xb in ((sx0, sx0 + 0.17), (sx1 - 0.17, sx1)): soft_box('M01_BRACO', xa, xb, sy0, sy1, 0.12, 0.63, M['linho'], 0.045)
-    soft_box('M01_ENCOSTO', sx0 + 0.17, sx1 - 0.17, sy1 - 0.17, sy1, 0.38, 0.74, M['linho'], 0.04)
-    n = 3; ws = (sx1 - sx0 - 0.34) / n
-    for i in range(n):
-        a = sx0 + 0.17 + i * ws
-        soft_box('M01_ASSENTO', a + 0.004, a + ws - 0.004, sy0 + 0.03, sy1 - 0.15, 0.40, 0.54, M['linho'], 0.055)
-        ob = soft_box('M01_ALMOFADA', a + 0.008, a + ws - 0.008, sy1 - 0.33, sy1 - 0.15, 0.50, 0.88, M['linho'], 0.07)
-        rot = Matrix.Translation(P(a + ws / 2, sy1 - 0.24, 0.52)) @ Matrix.Rotation(math.radians(-9), 4, 'X') @ Matrix.Translation(-P(a + ws / 2, sy1 - 0.24, 0.52))
-        ob.matrix_world = rot
-    # almofadas decorativas (Poly Haven)
-    ph('throw_pillows_01', sx0 + 0.62, sy1 - 0.36, 0.50, rot=180, scale=0.72, name='almofadas_sofa')
-    # M-02 poltrona (Poly Haven) com assento em bouclé caramelo
-    src = ph_source('modern_arm_chair_01')
-    for o in src[3]:
-        for slot in o.material_slots:
-            if slot.material and 'pillow' in slot.material.name: slot.material = M['boucle']
-    pa = it['M-02']; ph('modern_arm_chair_01', pa['cx'] + 0.08, pa['cy'] - 0.02, rot=100, name='M02_poltrona')
-    # M-03 mesa de centro Ø80 em freijó (tambor) e M-04 Ø55 com tampo mármore (Poly Haven)
-    m3 = it['M-03']; cyl('M03_TAMPO', m3['cx'], m3['cy'], m3['h'] - 0.03, m3['h'], m3['rad'], mat=M['freijo'], seg=64, bevel=0.006)
-    cyl('M03_BASE', m3['cx'], m3['cy'], 0.0, m3['h'] - 0.03, m3['rad'] - 0.08, m3['rad'] - 0.06, M['freijo'], 64)
-    m4 = it['M-04']; d4 = ph_dims('coffee_table_round_01')
-    ph('coffee_table_round_01', m4['cx'] + 0.04, m4['cy'] - 0.03, scale=(2 * m4['rad'] / d4.x, 2 * m4['rad'] / d4.y, m4['h'] / d4.z), name='M04_mesa_marmore')
-    # M-05 mesa lateral (Poly Haven)
-    m5 = it['M-05']; ph('side_table_01', m5['cx'] - 0.03, m5['cy'] + 0.06, rot=90, name='M05_lateral')
-    # D-01 tapete
-    tx0, ty0, tx1, ty1 = it['D-01']['r']; box('D01_TAPETE', tx0, tx1, ty0, ty1, 0.012, 0.024, M['tapete'], 'moveis', bevel=0.006)
-    # L-05 luminária de piso: tripé de madeira e cúpula de linho
-    l5 = it['L-05']; cx, cy = l5['cx'], l5['cy']
+    # ---- parede da TV (norte, y = 0): pintura opcional, ripado, rack suspenso, TV 65" e nichos com LED
+    if PAREDE == 'B':
+        bm = bmesh.new(); vs = [bm.verts.new((x, -0.0012, z)) for x, z in ((2.165, 0.0), (5.59, 0.0), (5.59, H), (2.165, H))]
+        bm.faces.new(vs); bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+        for f in bm.faces:
+            if f.normal.y > 0: f.normal_flip()
+        mesh_obj('PAREDE_TV_VERDE_OLIVA', bm, M['verde_oliva'], 'arquitetura')
+    def ripado(name, x0, x1):
+        bm = bmesh.new(); x = x0
+        while x + 0.02 <= x1 + 1e-6: bm_box(bm, x, x + 0.02, 0.003, 0.038, 0.0, H - 0.002); x += 0.035
+        mesh_obj(name, bm, M['freijo'], 'moveis')
+    if PAREDE == 'A': ripado('PAINEL_RIPADO_TV', 3.22, 4.86)     # A: painel ripado atrás da TV, parede neutra
+    ripado('COLUNA_RIPADA', 5.58, 5.87)                             # B: TV direto na parede verde, só a coluna ripada
+    rx0, rx1, ry0, ry1, rz0, rz1 = 2.56, 5.50, 0.04, 0.44, 0.32, 0.62
+    box('RACK', rx0, rx1, ry0, ry1 - 0.02, rz0, rz1, M['freijo'], 'moveis', bevel=0.003)
+    nf = 4; wf = (rx1 - rx0) / nf
+    for i in range(nf):
+        box('RACK_FRENTE', rx0 + i * wf + 0.0015, rx0 + (i + 1) * wf - 0.0015, ry1 - 0.02, ry1, rz0 + 0.004, rz1 - 0.004, M['freijo'], 'moveis', bevel=0.002, uvrot=math.pi / 2)
+    box('RACK_LED', rx0 + 0.05, rx1 - 0.05, ry1 - 0.10, ry1 - 0.08, rz0 - 0.004, rz0, M['led'], 'luz')
+    tvx = 4.04; box('TV65', tvx - 0.73, tvx + 0.73, 0.045, 0.072, 0.98, 1.82, M['preto'], 'moveis', bevel=0.004)
+    box('TV65_TELA', tvx - 0.722, tvx + 0.722, 0.0725, 0.0735, 0.988, 1.812, M['tv'], 'moveis')
+    for z in (1.08, 1.46, 1.84):
+        box('NICHO_PRATELEIRA', 4.91, 5.54, 0.038, 0.30, z - 0.03, z, M['freijo'], 'moveis', bevel=0.002)
+        box('NICHO_LED', 4.94, 5.51, 0.20, 0.22, z - 0.034, z - 0.03, M['led'], 'luz')
+    # decoração do rack e dos nichos (Poly Haven)
+    ph('ceramic_vase_01', 2.85, 0.24, rz1, scale=0.9, name='vaso_rack_1'); ph('ceramic_vase_03', 3.02, 0.22, rz1, scale=0.8, name='vaso_rack_2')
+    ph('potted_plant_04', 5.25, 0.24, rz1, scale=1.25, name='planta_rack')
+    ph('book_encyclopedia_set_01', 5.22, 0.16, 1.08, scale=0.55, name='livros_nicho')
+    ph('ceramic_vase_02', 5.05, 0.17, 1.46, scale=0.65, name='vaso_nicho_1'); ph('wooden_bowl_01', 5.34, 0.17, 1.46, scale=0.7, name='tigela_nicho')
+    ph('potted_plant_04', 5.12, 0.17, 1.84, scale=0.9, name='planta_nicho'); ph('lambis_shell', 5.38, 0.16, 1.84, rot=30, scale=1.2, name='concha_nicho')
+    # ---- sofá retrátil, almofadas, manta, tapete de juta
+    sx0, sx1, sb = 2.62, 5.48, 2.97
+    yf = build_sofa_retratil(sx0, sx1, sb, 1.05)
+    for (px, mat, w, yaw) in ((2.98, 'almof_terracota', 0.50, 6), (3.40, 'almof_oliva', 0.46, -4), (3.80, 'almof_creme', 0.45, 3),
+                              (4.72, 'almof_oliva', 0.46, 5), (5.10, 'almof_terracota', 0.50, -6)):
+        pillow('ALMOFADA', px, sb - 0.56, 0.71, w, w, 0.16, M[mat], yaw=yaw, tilt=17)
+    throw_blanket('MANTA_TRICO', 4.42, 5.06, sb - 0.50, yf + 0.012, 0.50, 0.14, M['manta_trico'])
+    box('TAPETE_JUTA', 2.58, 5.52, 0.68, 2.62, 0.012, 0.026, M['juta'], 'moveis', bevel=0.007)
+    # ---- arte sobre o sofá (molduras Poly Haven, artes próprias)
+    for i, x in enumerate((3.66, 4.42)):
+        k = ph_art('hanging_picture_frame_01', f'quadro{i + 1}', f'arte_{i + 1}.png')
+        ph('hanging_picture_frame_01', x, 2.97 - 0.015, 1.24, rot=180, scale=0.98, key=k, name='quadro_sofa')
+    # ---- iluminação de apoio: luminária de piso, mesa lateral com abajur, trilho com spots
+    cx, cy = 2.66, 0.78
     for k in range(3):
-        t = math.radians(90 + k * 120); fx, fy = cx + 0.24 * math.cos(t), cy + 0.24 * math.sin(t)
+        t = math.radians(90 + k * 120); fx, fy = cx + 0.22 * math.cos(t), cy + 0.22 * math.sin(t)
         cu = bpy.data.curves.new('tripe', 'CURVE'); cu.dimensions = '3D'; sp = cu.splines.new('POLY'); sp.points.add(1)
-        sp.points[0].co = (*P(fx, fy, 0), 1); sp.points[1].co = (*P(cx, cy, 1.20), 1); cu.bevel_depth = 0.013; cu.materials.append(M['madeira_pe'])
-        ob = bpy.data.objects.new('L05_PERNA', cu); coll('moveis').objects.link(ob)
-    cyl('L05_HASTE', cx, cy, 1.15, 1.30, 0.008, mat=M['preto'], seg=12)
-    sh = cyl('L05_CUPULA', cx, cy, 1.24, 1.56, 0.235, 0.20, M['cupula'], 64); bm = bmesh.new(); bm.from_mesh(sh.data)
+        sp.points[0].co = (*P(fx, fy, 0.012), 1); sp.points[1].co = (*P(cx, cy, 1.20), 1); cu.bevel_depth = 0.013; cu.materials.append(M['madeira_pe'])
+        ob = bpy.data.objects.new('LUMINARIA_PISO_PERNA', cu); coll('moveis').objects.link(ob)
+    sh = cyl('LUMINARIA_PISO_CUPULA', cx, cy, 1.24, 1.56, 0.235, 0.20, M['cupula'], 64); bm = bmesh.new(); bm.from_mesh(sh.data)
     bmesh.ops.delete(bm, geom=[f for f in bm.faces if abs(f.normal.z) > 0.9], context='FACES'); bm.to_mesh(sh.data); bm.free()
     sh.modifiers.new('esp', 'SOLIDIFY').thickness = 0.003
-    # D-02, D-03, D-11 plantas (Poly Haven)
-    ph('potted_plant_01', it['D-02']['cx'] - 0.03, it['D-02']['cy'] + 0.04, rot=30, scale=1.22, name='D02_planta')
-    ph('potted_plant_02', it['D-03']['cx'] + 0.02, it['D-03']['cy'] + 0.05, rot=-20, scale=0.85, name='D03_planta')
-    ph('potted_plant_02', it['D-11']['cx'], it['D-11']['cy'] - 0.03, rot=150, scale=1.05, name='D11_planta')
-    # D-04 par de quadros sobre o sofá (Poly Haven)
-    for i, (a, b) in enumerate(it['D-04']['list']):
-        k = ph_art('hanging_picture_frame_01', f'quadro{i + 1}', f'arte_{i + 1}.png')
-        ph('hanging_picture_frame_01', (a + b) / 2, 2.97 - 0.015, 1.30, rot=180, scale=0.98, key=k, name='D04_quadro')
-    # D-05 cortina em linho, prega wave, recolhida junto à parede
-    c5 = it['D-05']; build_curtain('D05_CORTINA', c5['x'], c5['a'], c5['b'], c5['open'], 0.02, 2.37)
-    # M-06 mesa de jantar redonda Ø120, base central
-    m6 = it['M-06']; cx, cy, r = m6['cx'], m6['cy'], m6['rad']
-    cyl('M06_TAMPO', cx, cy, 0.735, 0.765, r, mat=M['teca'], seg=96, bevel=0.008)
-    cyl('M06_COLUNA', cx, cy, 0.03, 0.735, 0.11, 0.14, M['teca'], 48)
-    cyl('M06_BASE', cx, cy, 0.0, 0.03, 0.30, 0.30, M['teca'], 64)
-    # M-07 cadeiras em madeira com assento de palhinha
-    m7 = it['M-07']
-    for ang in m7['angs']:
-        t = math.radians(ang); px, py = cx + m7['dist'] * math.cos(t), cy + m7['dist'] * math.sin(t)
-        build_chair(px, py, math.degrees(math.atan2(cy - py, cx - px)))
-    # MC-03 aparador em freijó com portas de palhinha e pés palito
-    ax0, ay0, ax1, ay1 = it['MC-03']['r']
-    box('MC03_CAIXA', ax0, ax1, ay0 + 0.005, ay1, 0.20, 0.78, M['freijo'], 'moveis', bevel=0.004)
-    nd = 4; wd = (ax1 - ax0 - 0.04) / nd
-    for i in range(nd):
-        a = ax0 + 0.02 + i * wd
-        box('MC03_PORTA', a + 0.002, a + wd - 0.002, ay1, ay1 + 0.012, 0.22, 0.76, M['freijo'], 'moveis', bevel=0.002)
-        box('MC03_PALHA', a + 0.04, a + wd - 0.04, ay1 + 0.0121, ay1 + 0.013, 0.26, 0.72, M['palhinha'], 'moveis')
-    for lx in (ax0 + 0.06, ax1 - 0.06):
-        for ly in (ay0 + 0.06, ay1 - 0.06): cyl('MC03_PE', lx, ly, 0.0, 0.20, 0.012, 0.009, M['preto'], 16)
-    # D-07 espelho redondo Ø80 com moldura preta
-    d7 = it['D-07']; e = cyl('D07_MOLDURA', d7['cx'], 0.0, 0.0, 0.025, d7['rad'], mat=M['preto'], seg=96)
-    e.data.transform(Matrix.Translation(-P(d7['cx'], 0.0, 0.0125))); e.rotation_euler = (math.radians(90), 0, 0); e.location = P(d7['cx'], 0.0125, d7['cz'])
-    e2 = cyl('D07_ESPELHO', d7['cx'], 0.0, 0.0, 0.004, d7['rad'] - 0.015, mat=M['espelho'], seg=96)
-    e2.data.transform(Matrix.Translation(-P(d7['cx'], 0.0, 0.002))); e2.rotation_euler = (math.radians(90), 0, 0); e2.location = P(d7['cx'], 0.0265, d7['cz'])
-    # L-06 abajur de cerâmica com cúpula de linho
-    l6 = it['L-06']; build_table_lamp('L06', l6['cx'], l6['cy'], l6['z'])
-    # decoração do aparador, rack e mesa
-    ph('book_encyclopedia_set_01', 7.75, 0.20, 0.78, rot=0, scale=0.75, name='livros_aparador')
-    ph('ceramic_vase_01', 8.00, 0.20, 0.78 + 0.0, rot=0, scale=1.0, name='vaso_aparador')
-    ph('ceramic_vase_03', 4.45, 0.24, 0.70, scale=0.9, name='vaso_rack')
-    ph('lambis_shell', 3.35, 0.25, 0.70, rot=40, scale=1.3, name='concha_rack')
-    ph('wooden_bowl_01', cx, cy, 0.765, scale=1.0, name='D09_fruteira')
-    ph('ceramic_vase_02', cx + 0.18, cy - 0.12, 0.765, scale=0.8, name='D09_vaso')
-    ph('wicker_basket_02', 5.30, 2.20, 0.0, rot=20, scale=1.3, name='cesto_sala')
-    # L-03 pendente em fibra natural Ø50 e L-01 trilho com spots
-    bm = bmesh.new(); bmesh.ops.create_uvsphere(bm, u_segments=64, v_segments=32, radius=0.25)
-    bmesh.ops.delete(bm, geom=[v for v in bm.verts if v.co.z < -1e-4], context='VERTS')
-    for v in bm.verts: v.co = Vector((v.co.x, v.co.y, v.co.z * 0.78)) + P(cx, cy, 1.52)
-    pd = mesh_obj('L03_CUPULA', bm, M['fibra'], 'moveis'); pd.data.shade_smooth(); pd.modifiers.new('esp', 'SOLIDIFY').thickness = 0.006
-    cyl('L03_CABO', cx, cy, 1.71, H, 0.003, mat=M['preto'], seg=8, smooth=False); cyl('L03_CANOPLA', cx, cy, H - 0.02, H, 0.05, mat=M['preto'], seg=32)
-    cyl('L03_LAMP', cx, cy, 1.58, 1.66, 0.03, mat=M['led'], seg=24)
+    point_light('LUMINARIA_PISO_LUZ', cx, cy, 1.40, 14)
+    tx, ty = 5.72, 2.62
+    cyl('MESA_LATERAL_TAMPO', tx, ty, 0.52, 0.55, 0.24, mat=M['freijo'], seg=48, bevel=0.004)
+    cyl('MESA_LATERAL_PE', tx, ty, 0.02, 0.52, 0.05, 0.07, M['freijo'], 32); cyl('MESA_LATERAL_BASE', tx, ty, 0.0, 0.02, 0.18, mat=M['freijo'], seg=48)
+    build_table_lamp('ABAJUR', tx, ty, 0.55); point_light('ABAJUR_LUZ', tx, ty, 0.88, 9)
     l1 = next(l for l in PROP['luminarias'] if l['cod'] == 'L-01'); (ax, ay), (bx, by) = l1['a'], l1['b']
-    box('L01_TRILHO', ax, bx, ay - 0.018, ay + 0.018, H - 0.035, H, M['preto'], 'moveis')
+    box('TRILHO', ax, bx, ay - 0.018, ay + 0.018, H - 0.035, H, M['preto'], 'moveis')
     for i, sx in enumerate((ax + 0.25, ax + 0.75, bx - 0.75, bx - 0.25)):
-        s = cyl('L01_SPOT', sx, ay, H - 0.20, H - 0.05, 0.035, mat=M['preto'], seg=24)
-        rot_tilt = Matrix.Translation(P(sx, ay, H - 0.05)) @ Matrix.Rotation(math.radians(25 if i < 2 else -25), 4, 'X') @ Matrix.Translation(-P(sx, ay, H - 0.05))
-        s.matrix_world = rot_tilt
-    # varanda: conjunto bistrô e planta (Poly Haven)
+        s = cyl('SPOT', sx, ay, H - 0.20, H - 0.05, 0.035, mat=M['preto'], seg=24)
+        s.matrix_world = Matrix.Translation(P(sx, ay, H - 0.05)) @ Matrix.Rotation(math.radians(25 if i < 2 else -25), 4, 'X') @ Matrix.Translation(-P(sx, ay, H - 0.05))
+    # ---- cortinas de voal até o teto, recolhidas nas laterais da porta-janela
+    build_curtains(2.32, [(0.02, 0.80), (2.10, 2.95)], 0.02, 2.37)
+    box('CORTINA_TRILHO', 2.30, 2.34, 0.02, 2.95, 2.37, 2.385, M['aluminio'], 'moveis')
+    # ---- plantas (Poly Haven)
+    ph('potted_plant_01', 2.47, 2.55, rot=30, scale=1.22, name='planta_janela')
+    ph('potted_plant_02', it['D-11']['cx'], it['D-11']['cy'] - 0.03, rot=150, scale=1.05, name='planta_jantar')
+    # ---- jantar: mesa de 6 lugares, cadeiras estofadas, pendente(s) verde-oliva
+    jx, jy = 7.50, 1.95
+    if MESA == 'redonda':
+        R = 0.70
+        cyl('MESA_TAMPO', jx, jy, 0.735, 0.77, R, mat=M['freijo'], seg=128, bevel=0.008)
+        cyl('MESA_COLUNA', jx, jy, 0.04, 0.735, 0.15, 0.19, M['freijo'], 64)
+        cyl('MESA_BASE', jx, jy, 0.0, 0.04, 0.40, 0.42, M['freijo'], 96)
+        for ang in (0, 60, 120, 180, 240, 300):
+            t = math.radians(ang); px, py = jx + 0.88 * math.cos(t), jy + 0.88 * math.sin(t)
+            build_dining_chair(px, py, math.degrees(math.atan2(jy - py, jx - px)))
+        pendant_dome('PENDENTE', jx, jy, 1.57, 0.26)
+        ph('wooden_bowl_01', jx - 0.10, jy + 0.05, 0.77, scale=1.1, name='fruteira'); ph('ceramic_vase_02', jx + 0.16, jy - 0.08, 0.77, scale=0.8, name='vaso_mesa')
+    else:
+        L_, W_ = 1.80, 0.95; x0, x1, y0, y1 = jx - L_ / 2, jx + L_ / 2, jy - W_ / 2, jy + W_ / 2
+        box('MESA_TAMPO', x0, x1, y0, y1, 0.735, 0.775, M['freijo'], 'moveis', bevel=0.006)
+        for lx in (x0 + 0.28, x1 - 0.34):
+            box('MESA_PE', lx, lx + 0.06, y0 + 0.12, y1 - 0.12, 0.0, 0.735, M['freijo'], 'moveis', bevel=0.004)
+        box('MESA_TRAVESSA', x0 + 0.34, x1 - 0.34, jy - 0.03, jy + 0.03, 0.62, 0.70, M['freijo'], 'moveis', bevel=0.003)
+        for px in (jx - 0.58, jx, jx + 0.58):
+            build_dining_chair(px, y0 - 0.17, 90); build_dining_chair(px, y1 + 0.17, -90)
+        for px in (jx - 0.45, jx + 0.45): pendant_dome('PENDENTE', px, jy, 1.58, 0.19)
+        ph('wooden_bowl_01', jx - 0.25, jy, 0.775, scale=1.1, name='fruteira'); ph('ceramic_vase_02', jx + 0.10, jy - 0.05, 0.775, scale=0.8, name='vaso_mesa')
+        ph('potted_plant_04', jx + 0.35, jy + 0.05, 0.775, scale=1.0, name='planta_mesa')
+    # ---- parede do jantar: só arte na parede (nada no chão no caminho da entrada)
+    for i, x in enumerate((7.10, 7.90)):
+        k = ph_art('hanging_picture_frame_01', f'quadro{4 + i}', f'arte_{4 + i}.png')
+        ph('hanging_picture_frame_01', x, 0.012, 1.22, rot=0, scale=0.98, key=k, name='quadro_jantar')
+    # ---- varanda: bistrô e planta (Poly Haven)
     ph('outdoor_table_chair_set_01', it['D-12']['cx'] - 0.05, it['D-12']['cy'] + 0.25, rot=90, scale=0.95, name='D12_bistro')
     ph('potted_plant_01', it['D-13']['cx'] + 0.02, it['D-13']['cy'] + 0.05, rot=80, scale=1.0, name='D13_planta')
 
@@ -715,21 +812,6 @@ def build_curtain(name, x, a, b, opened, z0, z1, depth=0.07):
     ob.modifiers.new('esp', 'SOLIDIFY').thickness = 0.004
     sub = ob.modifiers.new('sub', 'SUBSURF'); sub.levels = 1; sub.render_levels = 2
     box(name + '_TRILHO', x - 0.02, x + 0.02, a, b, z1, z1 + 0.02, M['aluminio'], 'moveis')
-
-def build_chair(px, py, face_deg):
-    """cadeira de jantar em madeira com assento de palhinha; face_deg = direção (planta) para onde a cadeira olha."""
-    parts = []; w, d, hs, hb = 0.45, 0.48, 0.46, 0.80
-    def add(ob): parts.append(ob); return ob
-    for lx in (-w / 2 + 0.025, w / 2 - 0.025):
-        for ly in (-d / 2 + 0.025, d / 2 - 0.025):
-            top = hb if ly < 0 else hs
-            add(box('M07_PE', px + lx - 0.018, px + lx + 0.018, py + ly - 0.018, py + ly + 0.018, 0, top, M['teca'], 'moveis', bevel=0.004))
-    add(box('M07_QUADRO', px - w / 2 + 0.01, px + w / 2 - 0.01, py - d / 2 + 0.01, py + d / 2 - 0.01, hs - 0.05, hs - 0.005, M['teca'], 'moveis', bevel=0.004))
-    add(box('M07_PALHA', px - w / 2 + 0.04, px + w / 2 - 0.04, py - d / 2 + 0.04, py + d / 2 - 0.04, hs - 0.008, hs + 0.004, M['palhinha'], 'moveis'))
-    add(box('M07_ENCOSTO', px - w / 2 + 0.02, px + w / 2 - 0.02, py - d / 2 + 0.006, py - d / 2 + 0.034, hb - 0.16, hb - 0.03, M['teca'], 'moveis', bevel=0.006))
-    for z in (0.16,): add(box('M07_TRAVA', px - w / 2 + 0.03, px + w / 2 - 0.03, py - 0.008, py + 0.008, z, z + 0.025, M['teca'], 'moveis'))
-    # encosto fica do lado −y local; a cadeira olha para +y local → gira para face_deg
-    for ob in parts: rot_obj(ob, (px, py), face_deg - 90)
 
 def build_table_lamp(cod, cx, cy, z):
     s = cyl(cod + '_BASE', cx, cy, z, z + 0.22, 0.10, mat=M['ceramica'], seg=48)
@@ -953,13 +1035,15 @@ SKY_ROT, SKY_CLAMP, SKY_STRENGTH = 123.0, 25.0, 1.0
 SUN_AZ, SUN_EL, SUN_STRENGTH, SUN_COLOR = 200.0, 21.0, 4.2, (1.0, 0.90, 0.76)
 
 CAMS = {   # (posição na planta, alvo na planta, lente mm, shift_y)
-    'sala':         ((9.00, 2.45), (2.40, 1.55), 18, -0.05),
+    'sala':         ((9.05, 2.85), (2.40, 1.25), 18, -0.05),
+    'estar':        ((6.25, 2.62), (2.45, 1.30), 18, -0.06),
     'cozinha-pia':  ((13.75, 4.05), (13.45, 1.00), 16, -0.05),
     'cozinha-cafe': ((9.85, 3.14), (10.75, 1.00), 16, -0.05),
     'quarto':       ((7.50, 5.00), (4.30, 7.70), 16, -0.05),
 }
-EXPO = {'sala': 3.3, 'cozinha-pia': 2.9, 'cozinha-cafe': 2.9, 'quarto': 3.4, 'planta': 1.0}
+EXPO = {'estar': 2.4, 'sala': 2.4, 'cozinha-pia': 2.9, 'cozinha-cafe': 2.9, 'quarto': 3.4, 'planta': 1.0}
 EYE = 1.60
+LED_SALA, LUZ_SALA = 1.2, 1.0
 
 def add_camera(name):
     if name == 'planta':
@@ -976,7 +1060,7 @@ def add_camera(name):
 
 # ======================================================================== montagem
 t0 = __import__('time').time()
-walls = build_walls(); build_openings(); build_floors(); build_baseboards(walls); build_arch(); build_rail()
+walls = build_walls(); build_openings(); build_floors(); build_baseboards(walls); build_rail()
 build_living(); build_kitchen(); build_bedroom(); build_world()
 print(f'cena montada em {__import__("time").time() - t0:.0f}s', flush=True)
 
@@ -998,6 +1082,10 @@ for v in VIEWS:
     cam = add_camera(v); sc.camera = cam; vs.exposure = EXPO.get(v, 0.0)
     kitchen = v.startswith('cozinha')
     M['led_coz'].node_tree.nodes['Emission'].inputs['Strength'].default_value = 6.0 if kitchen else 0.0
+    sala = v in ('sala', 'estar')
+    M['led'].node_tree.nodes['Emission'].inputs['Strength'].default_value = LED_SALA if sala else 0.0
+    M['lampada'].node_tree.nodes['Emission'].inputs['Strength'].default_value = 40.0 if sala else 0.0
+    for ld, wts in LIGHTS_ON: ld.energy = wts * LUZ_SALA if sala else 0.0
     if os.environ.get('PIX'):
         dg = bpy.context.evaluated_depsgraph_get(); cd = cam.data
         fr = [cam.matrix_world @ q for q in cd.view_frame(scene=sc)]
@@ -1011,6 +1099,6 @@ for v in VIEWS:
                 hits.append(f'{ob.name}/{mn} ({loc.x:.2f},{-loc.y:.2f},{loc.z:.2f}) n=({nor.x:.1f},{-nor.y:.1f},{nor.z:.1f})'); org = loc + d * 0.002
             print('PIX', v, pp, ' | '.join(hits), flush=True)
         continue
-    sc.render.filepath = os.path.join(OUT, f'{v}.png'); t1 = __import__('time').time()
+    sc.render.filepath = os.path.join(OUT, f'{v}_{OPCAO}.png' if '--opcao' in ARGS else f'{v}.png'); t1 = __import__('time').time()
     bpy.ops.render.render(write_still=True)
     print(f'{v}: {__import__("time").time() - t1:.0f}s', flush=True)

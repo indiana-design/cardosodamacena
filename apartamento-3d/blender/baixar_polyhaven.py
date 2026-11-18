@@ -6,7 +6,8 @@ MODELOS_2K = ['modern_arm_chair_01', 'coffee_table_round_01', 'side_table_01', '
 MODELOS_1K = ['outdoor_table_chair_set_01', 'mid_century_lounge_chair', 'modern_ceiling_lamp_01', 'hanging_picture_frame_01', 'hanging_picture_frame_02',
               'book_encyclopedia_set_01', 'ceramic_vase_01', 'ceramic_vase_02', 'ceramic_vase_03', 'ceramic_vase_04', 'lambis_shell', 'wooden_bowl_01',
               'wicker_basket_02', 'potted_plant_04', 'jug_01', 'tea_set_01']
-TEXTURAS_2K = ['laminate_floor_02', 'oak_veneer_01', 'teak_veneer', 'sapele_veneer', 'rough_linen', 'poly_wool_herringbone', 'marble_01', 'painted_plaster_wall']
+TEXTURAS_2K = ['laminate_floor_02', 'oak_veneer_01', 'teak_veneer', 'sapele_veneer', 'rough_linen', 'poly_wool_herringbone', 'marble_01', 'painted_plaster_wall',
+               'hessian_230', 'knitted_fleece', 'curly_teddy_natural', 'ribbed_corduroy']
 HDRI_4K = ['kloofendal_48d_partly_cloudy_puresky']
 
 def get_json(url): return json.loads(subprocess.check_output(['curl', '-sSfL', '-A', UA, url]))
